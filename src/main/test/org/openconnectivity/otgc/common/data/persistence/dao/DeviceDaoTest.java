@@ -22,7 +22,8 @@ package org.openconnectivity.otgc.common.data.persistence.dao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openconnectivity.otgc.common.data.entity.DeviceEntity;
+import org.openconnectivity.otgc.data.entity.DeviceEntity;
+import org.openconnectivity.otgc.data.persistence.dao.DeviceDao;
 
 import java.util.ArrayList;
 import java.util.List;

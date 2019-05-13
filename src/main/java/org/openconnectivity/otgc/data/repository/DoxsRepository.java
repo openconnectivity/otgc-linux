@@ -23,9 +23,10 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import org.apache.log4j.Logger;
 import org.iotivity.*;
+import org.openconnectivity.otgc.utils.constant.OcfOxmType;
 import org.openconnectivity.otgc.utils.constant.OcfResourceUri;
 import org.openconnectivity.otgc.domain.model.resource.secure.doxm.OcDoxm;
-import org.openconnectivity.otgc.domain.model.devicelist.Device;
+import org.openconnectivity.otgc.utils.handler.OCSetRandomPinHandler;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,7 +41,7 @@ public class DoxsRepository {
     @Inject
     public DoxsRepository(){}
 
-    public Completable doOwnershipTransfer(String deviceId, OCOxmType oxm) {
+    public Completable doOwnershipTransfer(String deviceId, OcfOxmType oxm) {
         return Completable.create(emitter -> {
             OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
 
@@ -56,9 +57,9 @@ public class DoxsRepository {
             };
 
             int ret = -1;
-            if (oxm == OCOxmType.OC_OXMTYPE_JW) {
+            if (oxm == OcfOxmType.OC_OXMTYPE_JW) {
                 ret = OCObt.performJustWorksOtm(uuid, handler);
-            } else if (oxm == OCOxmType.OC_OXMTYPE_RDP) {
+            } else if (oxm == OcfOxmType.OC_OXMTYPE_RDP) {
                 ret = OCObt.requestRandomPin(uuid, (OCUuid ocUuid, int status) -> {
                     if (status >= 0) {
                         LOG.debug("Successfully request Random PIN " + OCUuidUtil.uuidToString(ocUuid));
@@ -142,7 +143,7 @@ public class DoxsRepository {
         });
     }
 
-    public void setDisplayPinListener(OCDisplayRandomPinHandler displayPinListener) {
+    public void setDisplayPinListener(OCRandomPinHandler displayPinListener) {
         OCMain.setRandomPinHandler(displayPinListener);
     }
 

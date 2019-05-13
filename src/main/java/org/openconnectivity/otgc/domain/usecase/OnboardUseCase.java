@@ -20,10 +20,10 @@
 package org.openconnectivity.otgc.domain.usecase;
 
 import io.reactivex.Single;
-import org.iotivity.OCOxmType;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.data.repository.DoxsRepository;
+import org.openconnectivity.otgc.utils.constant.OcfOxmType;
 
 import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +40,7 @@ public class OnboardUseCase {
         this.doxsRepository = doxsRepository;
     }
 
-    public Single<Device> execute(Device deviceToOnboard, OCOxmType oxm) {
+    public Single<Device> execute(Device deviceToOnboard, OcfOxmType oxm) {
         final Single<Device> getUpdatedOcSecureResource = iotivityRepository.scanOwnedDevices()
                 .filter(device -> deviceToOnboard.getDeviceId().equals(device.getDeviceId())
                                     || deviceToOnboard.equalsHosts(device))

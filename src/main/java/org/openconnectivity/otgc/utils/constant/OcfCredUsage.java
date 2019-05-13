@@ -19,54 +19,37 @@
 
 package org.openconnectivity.otgc.utils.constant;
 
-import org.iotivity.OCCredUsage;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+public enum OcfCredUsage {
+    OC_CREDUSAGE_UNKNOWN (""),
+    OC_CREDUSAGE_TRUSTCA ("oic.sec.cred.trustca"),
+    OC_CREDUSAGE_CERT ("oic.sec.cred.cert"),
+    OC_CREDUSAGE_ROLECERT ("oic.sec.cred.rolecert"),
+    OC_CREDUSAGE_MFGTRUSTCA ("oic.sec.cred.mfgtrustca"),
+    OC_CREDUSAGE_MFGCERT ("oic.sec.cred.mfgcert");
 
-public class OcfCredUsage {
+    private String credUsage;
 
-    private OcfCredUsage() {
-        throw new NotImplementedException();
+    OcfCredUsage(String credUsage) {
+        this.credUsage = credUsage;
     }
 
-    // OcCredential usage
-    private static final String OC_CREDUSAGE_PREFIX = "oic.sec.cred.";
-    public static final String OC_CREDUSAGE_TRUSTCA = OC_CREDUSAGE_PREFIX + "trustca";
-    public static final String OC_CREDUSAGE_CERT = OC_CREDUSAGE_PREFIX + "cert";
-    public static final String OC_CREDUSAGE_ROLECERT = OC_CREDUSAGE_PREFIX + "rolecert";
-    public static final String OC_CREDUSAGE_MFGTRUSTCA = OC_CREDUSAGE_PREFIX + "mfgtrustca";
-    public static final String OC_CREDUSAGE_MFGCERT = OC_CREDUSAGE_PREFIX + "mfgcert";
-    public static final String OC_CREDUSAGE_UNSUPPORTED = "";
+    public String getValue() {
+        return credUsage;
+    }
 
-    public static String enumCredUsageToString(OCCredUsage credusage)
-    {
-        if (credusage == OCCredUsage.OC_CREDUSAGE_TRUSTCA) {
+    public static OcfCredUsage valueToEnum (String credUsage) {
+        if (credUsage.equals(OC_CREDUSAGE_TRUSTCA.getValue())){
             return OC_CREDUSAGE_TRUSTCA;
-        } else if (credusage == OCCredUsage.OC_CREDUSAGE_IDENTITY_CERT) {
+        } else if (credUsage.equals(OC_CREDUSAGE_CERT.getValue())) {
             return OC_CREDUSAGE_CERT;
-        } else if (credusage == OCCredUsage.OC_CREDUSAGE_ROLE_CERT) {
+        } else if (credUsage.equals(OC_CREDUSAGE_ROLECERT.getValue())) {
             return OC_CREDUSAGE_ROLECERT;
-        } else if (credusage == OCCredUsage.OC_CREDUSAGE_MFG_TRUSTCA) {
+        } else if (credUsage.equals(OC_CREDUSAGE_MFGTRUSTCA.getValue())) {
             return OC_CREDUSAGE_MFGTRUSTCA;
-        } else if (credusage == OCCredUsage.OC_CREDUSAGE_MFG_CERT) {
+        } else if (credUsage.equals(OC_CREDUSAGE_MFGCERT.getValue())) {
             return OC_CREDUSAGE_MFGCERT;
         } else {
-            return OC_CREDUSAGE_UNSUPPORTED;
-        }
-    }
-
-    public static OCCredUsage stringToEnumCredUsage(String credusage) {
-        if (credusage.equals(OC_CREDUSAGE_TRUSTCA)){
-            return OCCredUsage.OC_CREDUSAGE_TRUSTCA;
-        } else if (credusage.equals(OC_CREDUSAGE_CERT)) {
-            return OCCredUsage.OC_CREDUSAGE_IDENTITY_CERT;
-        } else if (credusage.equals(OC_CREDUSAGE_ROLECERT)) {
-            return OCCredUsage.OC_CREDUSAGE_ROLE_CERT;
-        } else if (credusage.equals(OC_CREDUSAGE_MFGTRUSTCA)) {
-            return OCCredUsage.OC_CREDUSAGE_MFG_TRUSTCA;
-        } else if (credusage.equals(OC_CREDUSAGE_MFGCERT)) {
-            return OCCredUsage.OC_CREDUSAGE_MFG_CERT;
-        } else {
-            return OCCredUsage.OC_CREDUSAGE_NULL;
+            return OC_CREDUSAGE_UNKNOWN;
         }
     }
 }

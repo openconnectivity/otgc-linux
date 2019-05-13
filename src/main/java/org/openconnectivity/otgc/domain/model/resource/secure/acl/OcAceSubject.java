@@ -20,7 +20,7 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.acl;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
@@ -106,12 +106,12 @@ public class OcAceSubject {
     public void parseToCbor(CborEncoder parent) {
         /* subject */
         if (this.getType().equals(OcAceSubjectType.UUID_TYPE)) {
-            OCRepUtil.repSetTextString(parent, OcfResourceAttributeKey.UUID_TYPE_KEY, this.getUuid());
+            OCRep.setTextString(parent, OcfResourceAttributeKey.UUID_TYPE_KEY, this.getUuid());
         } else if (this.getType().equals(OcAceSubjectType.CONN_TYPE)) {
-            OCRepUtil.repSetTextString(parent, OcfResourceAttributeKey.CONN_TYPE_KEY, this.getConnType());
+            OCRep.setTextString(parent, OcfResourceAttributeKey.CONN_TYPE_KEY, this.getConnType());
         } else if (this.getType().equals(OcAceSubjectType.ROLE_TYPE)) {
-            OCRepUtil.repSetTextString(parent, OcfResourceAttributeKey.ROLE_KEY, this.getRoleId());
-            OCRepUtil.repSetTextString(parent, OcfResourceAttributeKey.ROLE_AUTHORITY_KEY, this.getAuthority());
+            OCRep.setTextString(parent, OcfResourceAttributeKey.ROLE_KEY, this.getRoleId());
+            OCRep.setTextString(parent, OcfResourceAttributeKey.ROLE_AUTHORITY_KEY, this.getAuthority());
         }
     }
 }

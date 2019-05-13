@@ -19,8 +19,8 @@
 
 package org.openconnectivity.otgc.domain.model.resource.secure.cred;
 
-import org.iotivity.OCEncoding;
 import org.iotivity.OCRepresentation;
+import org.openconnectivity.otgc.utils.constant.OcfEncoding;
 
 public class OcCredOptionalData {
 
@@ -29,7 +29,7 @@ public class OcCredOptionalData {
     private static String REVSTAT_KEY = "revstat";
 
     private String optdata;
-    private OCEncoding encoding;
+    private OcfEncoding encoding;
     private boolean revstat;
 
     public OcCredOptionalData() {
@@ -44,11 +44,11 @@ public class OcCredOptionalData {
         this.optdata = data;
     }
 
-    public OCEncoding getEncoding() {
+    public OcfEncoding getEncoding() {
         return encoding;
     }
 
-    public void setEncoding(OCEncoding encoding) {
+    public void setEncoding(OcfEncoding encoding) {
         this.encoding = encoding;
     }
 
@@ -68,16 +68,13 @@ public class OcCredOptionalData {
                 case OC_REP_STRING:
                     if (rep.getName().equals(DATA_KEY)) {
                         optionalData.setOptdata(rep.getValue().getString());
+                    } else if (rep.getName().equals(ENCODING_KEY)) {
+                        optionalData.setEncoding(OcfEncoding.valueToEnum(rep.getValue().getString()));
                     }
                     break;
                 case OC_REP_BOOL:
                     if (rep.getName().equals(REVSTAT_KEY)) {
                         optionalData.setRevstat(rep.getValue().getBool());
-                    }
-                    break;
-                case OC_REP_INT:
-                    if (rep.getName().equals(ENCODING_KEY)) {
-                        optionalData.setEncoding(OCEncoding.swigToEnum((int)rep.getValue().getInteger()));
                     }
                     break;
                 default:

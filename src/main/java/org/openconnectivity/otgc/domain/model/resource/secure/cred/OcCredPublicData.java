@@ -20,15 +20,14 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.cred;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCEncoding;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfEncoding;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
 public class OcCredPublicData {
 
-    private OCEncoding encoding;
+    private OcfEncoding encoding;
     private String pemData;
     private byte[] derData;
 
@@ -36,11 +35,11 @@ public class OcCredPublicData {
 
     }
 
-    public OCEncoding getEncoding() {
+    public OcfEncoding getEncoding() {
         return encoding;
     }
 
-    public void setEncoding(OCEncoding encoding) {
+    public void setEncoding(OcfEncoding encoding) {
         this.encoding = encoding;
     }
 
@@ -62,29 +61,27 @@ public class OcCredPublicData {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* data DER format */
-        byte[] dataDer = OCRepUtil.repGetByteString(rep, OcfResourceAttributeKey.DATA_KEY);
+        byte[] dataDer = OCRep.getByteString(rep, OcfResourceAttributeKey.DATA_KEY);
         this.setDerData(dataDer);
         /* data PEM format */
-        String dataPem = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DATA_KEY);
+        String dataPem = OCRep.getString(rep, OcfResourceAttributeKey.DATA_KEY);
         this.setPemData(dataPem);
         /* encoding */
-        int encoding = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.ENCODING_KEY);
-        this.setEncoding(OCEncoding.swigToEnum(encoding));
+        String encoding = OCRep.getString(rep, OcfResourceAttributeKey.ENCODING_KEY);
+        this.setEncoding(OcfEncoding.valueToEnum(encoding));
     }
 
     public void parseToCbor(CborEncoder parent) {
         if (this.getEncoding() != null) {
-            OCRepUtil.repSetTextString(parent, OcfResourceAttributeKey.ENCODING_KEY, OcfEncoding.enumEncodingToString(this.getEncoding()));
+            OCRep.setTextString(parent, OcfResourceAttributeKey.ENCODING_KEY, this.getEncoding().getValue());
         }
 
         if (this.getPemData() != null && !this.getPemData().isEmpty()) {
-            OCRepUtil.repSetTextString(parent, OcfResourceAttributeKey.DATA_KEY, this.getPemData());
+            OCRep.setTextString(parent, OcfResourceAttributeKey.DATA_KEY, this.getPemData());
         }
 
         if (this.getDerData() != null) {
-            OCRepUtil.repSetByteString(parent, OcfResourceAttributeKey.DATA_KEY, this.getDerData());
+            OCRep.setByteString(parent, OcfResourceAttributeKey.DATA_KEY, this.getDerData());
         }
     }
-
-
 }

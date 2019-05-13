@@ -19,49 +19,34 @@
 
 package org.openconnectivity.otgc.utils.constant;
 
-import org.iotivity.OCEncoding;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+public enum OcfEncoding {
+    OC_ENCODING_UNKNOWN (""),
+    OC_ENCODING_BASE64 ("oic.sec.encoding.base64"),
+    OC_ENCODING_RAW ("oic.sec.encoding.raw"),
+    OC_ENCODING_PEM ("oic.sec.encoding.pem"),
+    OC_ENCODING_DER ("oic.sec.encoding.der");
 
-public class OcfEncoding {
+    private String encoding;
 
-    private OcfEncoding() {
-        throw new NotImplementedException();
+    OcfEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
-    // Encoding
-    private static String OC_ENCODING_PREFIX = "oic.sec.encoding.";
-    public static final String OC_ENCODING_BASE64 = OC_ENCODING_PREFIX + "base64";
-    public static final String OC_ENCODING_RAW = OC_ENCODING_PREFIX + "raw";
-    public static final String OC_ENCODING_PEM = OC_ENCODING_PREFIX + "pem";
-    public static final String OC_ENCODING_DER = OC_ENCODING_PREFIX + "der";
-    public static final String OC_ENCODING_UNSUPPORTED = "";
+    public String getValue() {
+        return encoding;
+    }
 
-    public static String enumEncodingToString(OCEncoding encoding)
-    {
-        if (encoding == OCEncoding.OC_ENCODING_BASE64) {
+    public static OcfEncoding valueToEnum(String encoding) {
+        if (encoding.equals(OC_ENCODING_BASE64)) {
             return OC_ENCODING_BASE64;
-        } else if (encoding == OCEncoding.OC_ENCODING_RAW) {
+        } else if (encoding.equals(OC_ENCODING_RAW)) {
             return OC_ENCODING_RAW;
-        } else if (encoding == OCEncoding.OC_ENCODING_PEM) {
+        } else if (encoding.equals(OC_ENCODING_PEM)) {
             return OC_ENCODING_PEM;
-        } else if (encoding == OCEncoding.OC_ENCODING_DER) {
+        } else if (encoding.equals(OC_ENCODING_DER)) {
             return OC_ENCODING_DER;
         } else {
-            return OC_ENCODING_UNSUPPORTED;
-        }
-    }
-
-    public static OCEncoding stringToEnumEncoding(String encoding) {
-        if (encoding.equals(OC_ENCODING_BASE64)) {
-            return OCEncoding.OC_ENCODING_BASE64;
-        } else if (encoding.equals(OC_ENCODING_RAW)) {
-            return OCEncoding.OC_ENCODING_RAW;
-        } else if (encoding.equals(OC_ENCODING_PEM)) {
-            return OCEncoding.OC_ENCODING_PEM;
-        } else if (encoding.equals(OC_ENCODING_DER)) {
-            return OCEncoding.OC_ENCODING_DER;
-        } else {
-            return OCEncoding.OC_ENCODING_UNSUPPORTED;
+            return OC_ENCODING_UNKNOWN;
         }
     }
 }

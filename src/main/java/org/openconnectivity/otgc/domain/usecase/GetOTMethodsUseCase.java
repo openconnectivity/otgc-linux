@@ -20,10 +20,10 @@
 package org.openconnectivity.otgc.domain.usecase;
 
 import io.reactivex.Single;
-import org.iotivity.OCOxmType;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.data.repository.DoxsRepository;
+import org.openconnectivity.otgc.utils.constant.OcfOxmType;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -39,7 +39,7 @@ public class GetOTMethodsUseCase {
         this.doxsRepository = doxsRepository;
     }
 
-    public Single<List<OCOxmType>> execute(Device device) {
+    public Single<List<OcfOxmType>> execute(Device device) {
         return iotivityRepository.getNonSecureEndpoint(device)
                 .flatMap(endpoint ->
                         doxsRepository.retrieveOTMethods(endpoint)

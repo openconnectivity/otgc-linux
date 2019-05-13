@@ -26,26 +26,35 @@ import org.openconnectivity.otgc.domain.model.resource.virtual.d.OcDeviceInfo;
 import java.util.List;
 
 public class Device implements Comparable<Device> {
+
+    public static final int NOTHING_PERMITS = 0;
+    public static final int DOXS_PERMITS = 1;
+    public static final int ACL_PERMITS = 2;
+    public static final int CRED_PERMITS = 4;
+    public static final int FULL_PERMITS = 8;
+
     private DeviceType deviceType;
     private DeviceRole role;
     private String deviceId;
-    private OcDeviceInfo deviceInfo;
+    private transient OcDeviceInfo deviceInfo;
     private String ipv6SecureHost;
     private String ipv6Host;
     private String ipv4SecureHost;
     private String ipv4Host;
+    private int permits;
 
     public Device() {}
 
-    public Device(DeviceType type, String deviceId, OcDeviceInfo deviceInfo, OCEndpoint endpoints) {
+    public Device(DeviceType type, String deviceId, OcDeviceInfo deviceInfo, OCEndpoint endpoints, int permits) {
         this.deviceType = type;
         this.role = DeviceRole.UNKNOWN;
         this.deviceId = deviceId;
         this.deviceInfo = deviceInfo;
+        this.permits = permits;
 
         while(endpoints != null) {
             String[] endpointStr = new String[1];
-            OCEndpointUtil.endpointToString(endpoints, endpointStr);
+            OCEndpointUtil.toString(endpoints, endpointStr);
 
             if (endpointStr[0].startsWith("coaps://") && endpointStr[0].contains(".")) {
                 ipv4SecureHost = endpointStr[0];
@@ -61,11 +70,12 @@ public class Device implements Comparable<Device> {
         }
     }
 
-    public Device(DeviceType type, String deviceId, OcDeviceInfo deviceInfo, List<String> endpoints) {
+    public Device(DeviceType type, String deviceId, OcDeviceInfo deviceInfo, List<String> endpoints, int permits) {
         this.deviceType = type;
         this.role = DeviceRole.UNKNOWN;
         this.deviceId = deviceId;
         this.deviceInfo = deviceInfo;
+        this.permits = permits;
 
         for (String endpoint : endpoints) {
             if (endpoint.startsWith("coaps://") && endpoint.contains(".")) {
@@ -168,15 +178,50 @@ public class Device implements Comparable<Device> {
         return true;
     }
 
+    public int getPermits() {
+        return permits;
+    }
+
+    public void setPermits(int permits) {
+        this.permits = permits;
+    }
+
+    public boolean hasACLpermit() {
+        return (permits & ACL_PERMITS) == ACL_PERMITS;
+    }
+
+    public boolean hasDOXSpermit() {
+        return (permits & DOXS_PERMITS) == DOXS_PERMITS;
+    }
+
+    public boolean hasCREDpermit() {
+        return (permits & CRED_PERMITS) == CRED_PERMITS;
+    }
+
     @Override
     public int compareTo(Device device) {
-        if (this.getDeviceInfo().getName().compareTo(device.getDeviceInfo().getName()) == 0) {
-            return this.getDeviceId().compareTo(device.getDeviceId());
-        } else if (this.getDeviceInfo().getName().isEmpty()) {
-            return "Unnamed".compareTo(device.getDeviceInfo().getName());
-        } else if (device.getDeviceInfo().getName().isEmpty()) {
-            return this.getDeviceInfo().getName().compareTo("Unnamed");
+        int res;
+
+        if (this.getDeviceType() ==  device.getDeviceType()) {     // Same types
+            int nameComparision = this.getDeviceInfo().getName().compareTo(device.getDeviceInfo().getName());
+            int uuidComparision = this.getDeviceId().compareTo(device.getDeviceId());
+
+            // order by name or order by UUID if the names are equals
+            res = (nameComparision == 0) ? uuidComparision : nameComparision;
+
+        } else {    // Different types
+
+            if (this.getDeviceType() == DeviceType.UNOWNED) {    // Is device1 unowned?
+                res = -1;
+            } else if (device.getDeviceType() == DeviceType.UNOWNED) {     // Is device2 unowned?
+                res = 1;
+            } else {
+                int permissionComparision = this.getPermits() - device.getPermits();
+                res = -1 * permissionComparision;
+            }
+
         }
-        return this.getDeviceInfo().getName().compareTo(device.getDeviceInfo().getName());
+
+        return res;
     }
 }

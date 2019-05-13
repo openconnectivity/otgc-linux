@@ -24,8 +24,8 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.iotivity.OCFactoryPresetsHandler;
 import org.iotivity.OCPki;
-import org.iotivity.OCSetFactoryPresetsHandler;
 import org.openconnectivity.otgc.utils.constant.OtgcConstant;
 import org.openconnectivity.otgc.data.repository.*;
 
@@ -69,7 +69,7 @@ public class InitOicStackUseCase {
 
     }
 
-    private OCSetFactoryPresetsHandler factoryReset = (device -> {
+    private OCFactoryPresetsHandler factoryReset = (device -> {
         try {
             factoryResetHandler(device);
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public class InitOicStackUseCase {
         // Store root CA as trusted anchor
         X509Certificate caCertificate = ioRepository.getAssetAsX509Certificate(OtgcConstant.ROOT_CERTIFICATE).blockingGet();
         String strCACertificate = certRepository.x509CertificateToPemString(caCertificate).blockingGet();
-        if (OCPki.addTrustAnchor(device, strCACertificate, strCACertificate.length()) == -1) {
+        if (OCPki.addMfgTrustAnchor(device, strCACertificate.getBytes()) == -1) {
             throw new Exception("Add trust anchor error");
         }
 
@@ -94,7 +94,7 @@ public class InitOicStackUseCase {
             PrivateKey caPrivateKey = ioRepository.getAssetAsPrivateKey(OtgcConstant.ROOT_PRIVATE_KEY).blockingGet();
 
             String strCACertificate = certRepository.x509CertificateToPemString(caCertificate).blockingGet();
-            if (OCPki.addMfgTrustAnchor(device, strCACertificate, strCACertificate.length()) == -1) {
+            if (OCPki.addMfgTrustAnchor(device, strCACertificate.getBytes()) == -1) {
                 emitter.onError(new Exception("Add manufacturer trust anchor error"));
             }
 
@@ -114,7 +114,7 @@ public class InitOicStackUseCase {
 
             X509Certificate identityCertificate = certRepository.generateIdentityCertificate(uuid, publicKey, caPrivateKey).blockingGet();
             String strIdentityCertificate = certRepository.x509CertificateToPemString(identityCertificate).blockingGet();
-            if (OCPki.addMfgCert(device, strIdentityCertificate, strIdentityCertificate.length(), strPrivateKey, strPrivateKey.length()) == -1) {
+            if (OCPki.addMfgCert(device, strIdentityCertificate.getBytes(), strPrivateKey.getBytes()) == -1) {
                 emitter.onError(new Exception("Add manufacturer certificate error"));
             }
 

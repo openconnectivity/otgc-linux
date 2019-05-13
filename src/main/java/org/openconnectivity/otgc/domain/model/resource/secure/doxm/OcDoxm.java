@@ -20,51 +20,50 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.doxm;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCOxmType;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
+import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
+import org.openconnectivity.otgc.utils.constant.OcfOxmType;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class OcDoxm {
+public class OcDoxm extends OcResourceBase {
 
-    private List<OCOxmType> oxms;
-    private OCOxmType oxmsel;
-    private Integer supportedCredential;
+    private List<OcfOxmType> oxms;
+    private OcfOxmType oxmsel;
+    private Long supportedCredential;
     private Boolean owned;
     private String deviceuuid;
     private String devowneruuid;
     private String rowneruuid;
-    private List<String> resourceTypes;
-    private List<String> interfaces;
 
     public OcDoxm() {
     }
 
-    public List<OCOxmType> getOxms() {
+    public List<OcfOxmType> getOxms() {
         return oxms;
     }
 
-    public void setOxms(List<OCOxmType> oxms) {
+    public void setOxms(List<OcfOxmType> oxms) {
         this.oxms = oxms;
     }
 
-    public OCOxmType getOxmsel() {
+    public OcfOxmType getOxmsel() {
         return oxmsel;
     }
 
-    public void setOxmsel(OCOxmType oxmsel) {
+    public void setOxmsel(OcfOxmType oxmsel) {
         this.oxmsel = oxmsel;
     }
 
-    public Integer getSupportedCredential() {
+    public Long getSupportedCredential() {
         return supportedCredential;
     }
 
-    public void setSupportedCredential(Integer supportedCredential) {
+    public void setSupportedCredential(Long supportedCredential) {
         this.supportedCredential = supportedCredential;
     }
 
@@ -100,104 +99,88 @@ public class OcDoxm {
         this.rowneruuid = rowneruuid;
     }
 
-    public List<String> getResourceTypes() {
-        return resourceTypes;
-    }
-
-    public void setResourceTypes(List<String> resourceTypes) {
-        this.resourceTypes = resourceTypes;
-    }
-
-    public List<String> getInterfaces() {
-        return interfaces;
-    }
-
-    public void setInterfaces(List<String> interfaces) {
-        this.interfaces = interfaces;
-    }
-
     public void parseOCRepresentation(OCRepresentation rep) {
         /* oxms */
-        int[] oxmsValue = OCRepUtil.repGetIntArray(rep, OcfResourceAttributeKey.OXMS_KEY);
-        List<OCOxmType> oxmTypes = new ArrayList<>();
-        for (int value : oxmsValue) {
-            oxmTypes.add(OCOxmType.swigToEnum(value));
+        long[] oxmsValue = OCRep.getLongArray(rep, OcfResourceAttributeKey.OXMS_KEY);
+        List<OcfOxmType> oxmTypes = new ArrayList<>();
+        for (long value : oxmsValue) {
+            oxmTypes.add(OcfOxmType.valueToEnum((int)value));
         }
         this.setOxms(oxmTypes);
         /* oxmsel */
-        int oxms = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.OXMSEL_KEY);
-        this.setOxmsel(oxms == -1 ? oxmTypes.get(0): OCOxmType.swigToEnum(oxms));
+        int oxms = OCRep.getLong(rep, OcfResourceAttributeKey.OXMSEL_KEY).intValue();
+        this.setOxmsel(oxms == -1 ? oxmTypes.get(0): OcfOxmType.valueToEnum(oxms));
         /* sct */
-        int sct = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.SUPPORTED_CREDENTIAL_KEY);
-        this.setSupportedCredential(Integer.valueOf(sct));
+        Long sct = OCRep.getLong(rep, OcfResourceAttributeKey.SUPPORTED_CREDENTIAL_KEY);
+        this.setSupportedCredential(sct);
         /* owned */
-        boolean owned = OCRepUtil.repGetBoolean(rep, OcfResourceAttributeKey.OWNED_KEY);
+        boolean owned = OCRep.getBoolean(rep, OcfResourceAttributeKey.OWNED_KEY);
         this.setOwned(Boolean.valueOf(owned));
         /* deviceuuid */
-        String deviceuuid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DEVICE_UUID_KEY);
+        String deviceuuid = OCRep.getString(rep, OcfResourceAttributeKey.DEVICE_UUID_KEY);
         this.setDeviceuuid(deviceuuid);
         /* devowneruuid */
-        String devowneruuid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DEVOWNER_UUID_KEY);
+        String devowneruuid = OCRep.getString(rep, OcfResourceAttributeKey.DEVOWNER_UUID_KEY);
         this.setDevowneruuid(devowneruuid);
         /* rowneruuid */
-        String rowneruuid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ROWNER_UUID_KEY);
+        String rowneruuid = OCRep.getString(rep, OcfResourceAttributeKey.ROWNER_UUID_KEY);
         this.setRowneruuid(rowneruuid);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(Arrays.asList(resourceTypes));
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setResourceTypes(Arrays.asList(interfaces));
     }
 
     public CborEncoder parseToCbor() {
-        CborEncoder root = OCRepUtil.repBeginRootObject();
+        CborEncoder root = OCRep.beginRootObject();
 
         /* oxms */
         if (this.getOxms() != null && !this.getOxms().isEmpty()) {
-            int[] intArray = new int[this.getOxms().size()];
+            long[] intArray = new long[this.getOxms().size()];
             int i = 0;
-            for (OCOxmType value : this.getOxms()) {
-                intArray[i] = value.swigValue();
+            for (OcfOxmType value : this.getOxms()) {
+                intArray[i] = value.getValue();
                 i++;
             }
-            OCRepUtil.repSetIntArray(root, OcfResourceAttributeKey.OXMS_KEY, intArray);
+            OCRep.setLongArray(root, OcfResourceAttributeKey.OXMS_KEY, intArray);
         }
 
         /* oxmsel */
         if (this.getOxmsel() != null) {
-            OCRepUtil.repSetInt(root, OcfResourceAttributeKey.OXMSEL_KEY, this.getOxmsel().swigValue());
+            OCRep.setLong(root, OcfResourceAttributeKey.OXMSEL_KEY, this.getOxmsel().getValue());
         }
         /* sct */
         if (this.getSupportedCredential() != null) {
-            OCRepUtil.repSetInt(root, OcfResourceAttributeKey.SUPPORTED_CREDENTIAL_KEY, this.getSupportedCredential());
+            OCRep.setLong(root, OcfResourceAttributeKey.SUPPORTED_CREDENTIAL_KEY, this.getSupportedCredential());
         }
         /* owned */
         if (this.getOwned() != null) {
-            OCRepUtil.repSetBoolean(root, OcfResourceAttributeKey.OWNED_KEY, this.getOwned());
+            OCRep.setBoolean(root, OcfResourceAttributeKey.OWNED_KEY, this.getOwned());
         }
         /* deviceuuid */
         if (this.getDeviceuuid() != null && !this.getDeviceuuid().isEmpty()) {
-            OCRepUtil.repSetTextString(root, OcfResourceAttributeKey.DEVICE_UUID_KEY, this.getDeviceuuid());
+            OCRep.setTextString(root, OcfResourceAttributeKey.DEVICE_UUID_KEY, this.getDeviceuuid());
         }
         /* devowneruuid */
         if (this.getDevowneruuid() != null && !this.getDevowneruuid().isEmpty()) {
-            OCRepUtil.repSetTextString(root, OcfResourceAttributeKey.DEVOWNER_UUID_KEY, this.getDevowneruuid());
+            OCRep.setTextString(root, OcfResourceAttributeKey.DEVOWNER_UUID_KEY, this.getDevowneruuid());
         }
         /* rowneruuid */
         if (this.getRowneruuid() != null && !this.getRowneruuid().isEmpty()) {
-            OCRepUtil.repSetTextString(root, OcfResourceAttributeKey.ROWNER_UUID_KEY, this.getRowneruuid());
+            OCRep.setTextString(root, OcfResourceAttributeKey.ROWNER_UUID_KEY, this.getRowneruuid());
         }
         /* rt */
         if (this.getResourceTypes() != null && !this.getResourceTypes().isEmpty()) {
-            OCRepUtil.repSetStringArray(root, OcfResourceAttributeKey.RESOURCE_TYPES_KEY, this.getResourceTypes().toArray(new String[0]));
+            OCRep.setStringArray(root, OcfResourceAttributeKey.RESOURCE_TYPES_KEY, this.getResourceTypes().toArray(new String[0]));
         }
         /* if */
         if (this.getInterfaces() != null && !this.getInterfaces().isEmpty()) {
-            OCRepUtil.repSetStringArray(root, OcfResourceAttributeKey.INTERFACES_KEY, this.getInterfaces().toArray(new String[0]));
+            OCRep.setStringArray(root, OcfResourceAttributeKey.INTERFACES_KEY, this.getInterfaces().toArray(new String[0]));
         }
 
-        OCRepUtil.repEndRootObject();
+        OCRep.endRootObject();
 
         return root;
     }

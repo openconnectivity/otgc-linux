@@ -20,19 +20,18 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.cred;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
+import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class OcCredentials {
+public class OcCredentials extends OcResourceBase {
 
     private List<OcCredential> credList;
-    private List<String> resourceTypes;
-    private List<String> interfaces;
     private String rowneruuid;
 
     public OcCredentials() {
@@ -46,22 +45,6 @@ public class OcCredentials {
         this.credList = credList;
     }
 
-    public List<String> getResourceTypes() {
-        return resourceTypes;
-    }
-
-    public void setResourceTypes(List<String> resourceTypes) {
-        this.resourceTypes = resourceTypes;
-    }
-
-    public List<String> getInterfaces() {
-        return interfaces;
-    }
-
-    public void setInterfaces(List<String> interfaces) {
-        this.interfaces = interfaces;
-    }
-
     public String getRowneruuid() {
         return rowneruuid;
     }
@@ -72,7 +55,7 @@ public class OcCredentials {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* creds */
-        OCRepresentation credsObj = OCRepUtil.repGetObjectArray(rep, OcfResourceAttributeKey.CREDENTIALS_KEY);
+        OCRepresentation credsObj = OCRep.getObjectArray(rep, OcfResourceAttributeKey.CREDENTIALS_KEY);
         List<OcCredential> credList = new ArrayList<>();
         while (credsObj != null) {
             OcCredential cred = new OcCredential();
@@ -83,35 +66,35 @@ public class OcCredentials {
         }
         this.setCredList(credList);
         /* rowneruuid */
-        String rowneruuid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ROWNER_UUID_KEY);
+        String rowneruuid = OCRep.getString(rep, OcfResourceAttributeKey.ROWNER_UUID_KEY);
         this.setRowneruuid(rowneruuid);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(Arrays.asList(resourceTypes));
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(Arrays.asList(interfaces));
     }
 
     public CborEncoder parseToCbor() {
-        CborEncoder root = OCRepUtil.repBeginRootObject();
+        CborEncoder root = OCRep.beginRootObject();
 
         if (this.getCredList() != null && !this.getCredList().isEmpty()) {
-            CborEncoder credsArray = OCRepUtil.repOpenArray(root, OcfResourceAttributeKey.CREDENTIALS_KEY);
+            CborEncoder credsArray = OCRep.openArray(root, OcfResourceAttributeKey.CREDENTIALS_KEY);
             for (OcCredential cred : this.getCredList()) {
-                CborEncoder credObj = OCRepUtil.repBeginObject(credsArray);
+                CborEncoder credObj = OCRep.beginObject(credsArray);
                 cred.parseToCbor(credObj);
-                OCRepUtil.repCloseObject(credsArray, credObj);
+                OCRep.closeObject(credsArray, credObj);
             }
 
-            OCRepUtil.repCloseArray(root, credsArray);
+            OCRep.closeArray(root, credsArray);
         }
 
         if (this.getRowneruuid() != null && !this.getRowneruuid().isEmpty()) {
-            OCRepUtil.repSetTextString(root, OcfResourceAttributeKey.ROWNER_UUID_KEY, this.getRowneruuid());
+            OCRep.setTextString(root, OcfResourceAttributeKey.ROWNER_UUID_KEY, this.getRowneruuid());
         }
 
-        OCRepUtil.repEndRootObject();
+        OCRep.endRootObject();
 
         return root;
     }

@@ -20,8 +20,13 @@
 package org.openconnectivity.otgc.data.entity;
 
 import io.reactivex.annotations.NonNull;
+import io.reactivex.annotations.Nullable;
+import org.iotivity.OCEndpoint;
+import org.iotivity.OCEndpointUtil;
+import org.openconnectivity.otgc.domain.model.devicelist.DeviceType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,7 +34,8 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(query = "SELECT d FROM DeviceEntity d", name="Device.findAll"),
         @NamedQuery(query = "SELECT d FROM DeviceEntity d WHERE deviceid=:id", name="Device.findById"),
-        @NamedQuery(query = "UPDATE DeviceEntity SET name=:name WHERE deviceid=:id", name="Device.updateName")
+        @NamedQuery(query = "UPDATE DeviceEntity SET name=:name WHERE deviceid=:id", name="Device.updateName"),
+        @NamedQuery(query = "UPDATE DeviceEntity SET type=:type, permits=:permits WHERE deviceid=:id", name="Device.updateType")
 })
 public class DeviceEntity {
     @Id
@@ -47,12 +53,36 @@ public class DeviceEntity {
     @Column(name = "host")
     private List<String> hosts;
 
+    @Column(name = "type")
+    private DeviceType type;
+
+    @Column(name = "permits")
+    private int permits;
+
     public DeviceEntity(){}
 
-    public DeviceEntity(@NonNull String id, String name, List<String> hosts) {
+    public DeviceEntity(@NonNull String id, String name, OCEndpoint endpoints, @Nullable DeviceType type, int permits) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.permits = permits;
+        this.hosts = new ArrayList<>();
+
+        while(endpoints != null) {
+            String[] endpointStr = new String[1];
+            OCEndpointUtil.toString(endpoints, endpointStr);
+            this.hosts.add(endpointStr[0]);
+
+            endpoints = endpoints.getNext();
+        }
+    }
+
+    public DeviceEntity(@NonNull String id, String name, List<String> hosts, @Nullable DeviceType type, int permits) {
         this.id = id;
         this.name = name;
         this.hosts = hosts;
+        this.type = type;
+        this.permits = permits;
     }
 
     public String getId() {
@@ -65,5 +95,13 @@ public class DeviceEntity {
 
     public List<String> getHosts() {
         return hosts;
+    }
+
+    public DeviceType getType() {
+        return type;
+    }
+
+    public int getPermits() {
+        return permits;
     }
 }

@@ -25,6 +25,9 @@ import org.apache.log4j.Logger;
 import org.iotivity.*;
 import org.openconnectivity.otgc.domain.model.resource.secure.cred.*;
 import org.openconnectivity.otgc.domain.model.resource.secure.csr.OcCsr;
+import org.openconnectivity.otgc.utils.constant.OcfCredType;
+import org.openconnectivity.otgc.utils.constant.OcfCredUsage;
+import org.openconnectivity.otgc.utils.constant.OcfEncoding;
 import org.openconnectivity.otgc.utils.constant.OcfResourceUri;
 
 import javax.crypto.SecretKey;
@@ -111,12 +114,12 @@ public class CmsRepository {
             if (OCMain.initPost(OcfResourceUri.CRED_URI, ep, null, handler, OCQos.HIGH_QOS)) {
                 OcCredPublicData publicData = new OcCredPublicData();
                 publicData.setPemData(identityCert);
-                publicData.setEncoding(OCEncoding.OC_ENCODING_PEM);
+                publicData.setEncoding(OcfEncoding.OC_ENCODING_PEM);
 
                 OcCredential cred = new OcCredential();
                 cred.setSubjectuuid(uuid);
-                cred.setCredtype(OCCredType.OC_CREDTYPE_CERT);
-                cred.setCredusage(OCCredUsage.OC_CREDUSAGE_IDENTITY_CERT);
+                cred.setCredtype(OcfCredType.OC_CREDTYPE_CERT);
+                cred.setCredusage(OcfCredUsage.OC_CREDUSAGE_CERT);
                 cred.setPublicData(publicData);
                 List<OcCredential> credList = new ArrayList<>();
                 credList.add(cred);
@@ -160,7 +163,7 @@ public class CmsRepository {
             if (OCMain.initPost(OcfResourceUri.CRED_URI, ep, null, handler, OCQos.HIGH_QOS)) {
                 OcCredPublicData publicData = new OcCredPublicData();
                 publicData.setPemData(roleCert);
-                publicData.setEncoding(OCEncoding.OC_ENCODING_PEM);
+                publicData.setEncoding(OcfEncoding.OC_ENCODING_PEM);
 
                 OcCredRole role = new OcCredRole();
                 role.setRole(roleId);
@@ -168,8 +171,8 @@ public class CmsRepository {
 
                 OcCredential cred = new OcCredential();
                 cred.setSubjectuuid(uuid);
-                cred.setCredtype(OCCredType.OC_CREDTYPE_CERT);
-                cred.setCredusage(OCCredUsage.OC_CREDUSAGE_ROLE_CERT);
+                cred.setCredtype(OcfCredType.OC_CREDTYPE_CERT);
+                cred.setCredusage(OcfCredUsage.OC_CREDUSAGE_ROLECERT);
                 cred.setPublicData(publicData);
                 cred.setRoleid(role);
                 List<OcCredential> credList = new ArrayList<>();
@@ -214,11 +217,11 @@ public class CmsRepository {
             if (OCMain.initPost(OcfResourceUri.CRED_URI, ep, null, handler, OCQos.HIGH_QOS)) {
                 OcCredPrivateData privateData = new OcCredPrivateData();
                 privateData.setDataDer(symmetricKey);
-                privateData.setEncoding(OCEncoding.OC_ENCODING_RAW);
+                privateData.setEncoding(OcfEncoding.OC_ENCODING_RAW);
 
                 OcCredential cred = new OcCredential();
                 cred.setSubjectuuid(uuid);
-                cred.setCredtype(OCCredType.OC_CREDTYPE_PSK);
+                cred.setCredtype(OcfCredType.OC_CREDTYPE_PSK);
                 cred.setPrivateData(privateData);
                 List<OcCredential> credList = new ArrayList<>();
                 credList.add(cred);
@@ -244,7 +247,7 @@ public class CmsRepository {
         });
     }
 
-    public Completable deleteCredential(String endpoint, int credId) {
+    public Completable deleteCredential(String endpoint, long credId) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);

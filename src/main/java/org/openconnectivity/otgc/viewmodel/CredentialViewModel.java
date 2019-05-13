@@ -30,6 +30,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import org.openconnectivity.otgc.domain.model.resource.secure.cred.OcCredential;
 import org.openconnectivity.otgc.domain.model.resource.secure.cred.OcCredentials;
+import org.openconnectivity.otgc.domain.usecase.UpdateDeviceTypeUseCase;
+import org.openconnectivity.otgc.utils.constant.NotificationKey;
 import org.openconnectivity.otgc.utils.rx.SchedulersFacade;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.domain.usecase.credential.DeleteCredentialUseCase;
@@ -62,6 +64,7 @@ public class CredentialViewModel implements ViewModel {
     private final ProvisionRoleCertificateUseCase provisionRoleCertificateUseCase;
     private final RetrieveCredentialsUseCase retrieveCredentialsUseCase;
     private final DeleteCredentialUseCase deleteCredentialUseCase;
+    private final UpdateDeviceTypeUseCase updateDeviceTypeUseCase;
 
     // Observable responses
     private final ObjectProperty<Response<Boolean>> createCredResponse = new SimpleObjectProperty<>();
@@ -80,12 +83,14 @@ public class CredentialViewModel implements ViewModel {
                                ProvisionIdentityCertificateUseCase provisionIdentityCertificateUseCase,
                                ProvisionRoleCertificateUseCase provisionRoleCertificateUseCase,
                                RetrieveCredentialsUseCase retrieveCredentialsUseCase,
-                               DeleteCredentialUseCase deleteCredentialUseCase) {
+                               DeleteCredentialUseCase deleteCredentialUseCase,
+                               UpdateDeviceTypeUseCase updateDeviceTypeUseCase) {
         this.schedulersFacade = schedulersFacade;
         this.provisionIdentityCertificateUseCase = provisionIdentityCertificateUseCase;
         this.provisionRoleCertificateUseCase = provisionRoleCertificateUseCase;
         this.retrieveCredentialsUseCase = retrieveCredentialsUseCase;
         this.deleteCredentialUseCase = deleteCredentialUseCase;
+        this.updateDeviceTypeUseCase = updateDeviceTypeUseCase;
     }
 
     public void initialize() {
@@ -97,8 +102,7 @@ public class CredentialViewModel implements ViewModel {
 
     public ObservableBooleanValue cmsVisibleProperty() {
         return Bindings.createBooleanBinding(() -> deviceProperty.get() != null
-                && (deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_SELF
-                || deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_OTHER), deviceProperty);
+                && (deviceProperty.get().getDeviceType() != DeviceType.UNOWNED), deviceProperty);
     }
 
     public ObjectProperty<Response<Boolean>> createCredResponseProperty() {
@@ -118,8 +122,7 @@ public class CredentialViewModel implements ViewModel {
         credListProperty().clear();
 
         if ((newValue != null) && newValue.equals(resourceBundle.getString("client.tab.cms")) && deviceProperty.get() != null
-                && (deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_SELF
-                    || deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_OTHER)) {
+                && (deviceProperty.get().getDeviceType() != DeviceType.UNOWNED)) {
             retrieveCreds(deviceProperty.get());
         }
     }
@@ -129,8 +132,7 @@ public class CredentialViewModel implements ViewModel {
         credListProperty().clear();
 
         if (selectedTabProperty().get() != null && selectedTabProperty().get().equals(resourceBundle.getString("client.tab.cms")) && (newValue != null)
-                &&(newValue.getDeviceType() == DeviceType.OWNED_BY_SELF
-                    || newValue.getDeviceType() == DeviceType.OWNED_BY_OTHER)) {
+                &&(newValue.getDeviceType() != DeviceType.UNOWNED)) {
             retrieveCreds(newValue);
         }
     }
@@ -141,8 +143,38 @@ public class CredentialViewModel implements ViewModel {
                 .observeOn(schedulersFacade.ui())
                 .doOnSubscribe(__ -> retrieveCredsResponse.setValue(Response.loading()))
                 .subscribe(
-                        credentials -> retrieveCredsResponse.setValue(Response.success(credentials)),
-                        throwable -> retrieveCredsResponse.setValue(Response.error(throwable))
+                        credentials -> {
+                            retrieveCredsResponse.setValue(Response.success(credentials));
+
+                            if (!device.hasCREDpermit()
+                                    && (device.getDeviceType() == DeviceType.OWNED_BY_OTHER
+                                    || device.getDeviceType() == DeviceType.OWNED_BY_OTHER_WITH_PERMITS)) {
+                                disposable.add(updateDeviceTypeUseCase.execute(device.getDeviceId(),
+                                        DeviceType.OWNED_BY_OTHER_WITH_PERMITS,
+                                        device.getPermits() | Device.CRED_PERMITS)
+                                        .subscribeOn(schedulersFacade.io())
+                                        .observeOn(schedulersFacade.ui())
+                                        .subscribe(
+                                                () -> deviceListToolbarDetailScope.publish(NotificationKey.UPDATE_DEVICE_TYPE, device),
+                                                throwable -> retrieveCredsResponse.setValue(Response.error(throwable))
+                                        ));
+                            }
+                        },
+                        throwable -> {
+                            retrieveCredsResponse.setValue(Response.error(throwable));
+
+                            if (device.hasCREDpermit()) {
+                                disposable.add(updateDeviceTypeUseCase.execute(device.getDeviceId(),
+                                        DeviceType.OWNED_BY_OTHER,
+                                        device.getPermits() & ~Device.CRED_PERMITS)
+                                        .subscribeOn(schedulersFacade.io())
+                                        .observeOn(schedulersFacade.ui())
+                                        .subscribe(
+                                                () -> deviceListToolbarDetailScope.publish(NotificationKey.UPDATE_DEVICE_TYPE, device),
+                                                throwable2 -> retrieveCredsResponse.setValue(Response.error(throwable))
+                                        ));
+                            }
+                        }
                 )
         );
     }
@@ -185,7 +217,7 @@ public class CredentialViewModel implements ViewModel {
         );
     }
 
-    public void deleteCred(int credId) {
+    public void deleteCred(long credId) {
         disposable.add(deleteCredentialUseCase.execute(deviceProperty.get(), credId)
                 .subscribeOn(schedulersFacade.io())
                 .observeOn(schedulersFacade.ui())

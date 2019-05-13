@@ -22,5 +22,6 @@ package org.openconnectivity.otgc.domain.model.devicelist;
 public enum DeviceType {
     UNOWNED,
     OWNED_BY_SELF,
-    OWNED_BY_OTHER
+    OWNED_BY_OTHER,
+    OWNED_BY_OTHER_WITH_PERMITS
 }

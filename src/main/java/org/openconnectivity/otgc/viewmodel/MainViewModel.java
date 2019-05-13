@@ -25,9 +25,9 @@ import de.saxsys.mvvmfx.utils.notifications.NotificationCenter;
 import io.reactivex.disposables.CompositeDisposable;
 import javafx.beans.property.*;
 import javafx.scene.control.ProgressBar;
-import org.iotivity.OCDisplayRandomPinHandler;
-import org.iotivity.OCSetRandomPinHandler;
+import org.iotivity.OCRandomPinHandler;
 import org.openconnectivity.otgc.utils.constant.NotificationKey;
+import org.openconnectivity.otgc.utils.handler.OCSetRandomPinHandler;
 import org.openconnectivity.otgc.utils.rx.SchedulersFacade;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.domain.usecase.InitOicStackUseCase;
@@ -95,7 +95,7 @@ public class MainViewModel implements ViewModel {
         return initOicStackResponse;
     }
 
-    public void setDisplayPinListener(OCDisplayRandomPinHandler displayPinListener) {
+    public void setDisplayPinListener(OCRandomPinHandler displayPinListener) {
         displayPinListenerUseCase.execute(displayPinListener);
     }
 

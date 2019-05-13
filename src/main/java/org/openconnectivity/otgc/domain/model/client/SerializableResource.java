@@ -20,9 +20,8 @@
 package org.openconnectivity.otgc.domain.model.client;
 
 import io.reactivex.annotations.NonNull;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
-import org.iotivity.OCType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -100,19 +99,19 @@ public class SerializableResource implements Serializable {
                     properties.put(ocRepresentation.getName(), ocRepresentation.getValue().getString());
                     break;
                 case OC_REP_STRING_ARRAY:
-                    properties.put(ocRepresentation.getName(), OCRepUtil.ocArrayToStringArray(ocRepresentation.getValue().getArray()));
+                    properties.put(ocRepresentation.getName(), OCRep.ocArrayToStringArray(ocRepresentation.getValue().getArray()));
                     break;
                 case OC_REP_INT:
                     properties.put(ocRepresentation.getName(), (int)ocRepresentation.getValue().getInteger());
                     break;
                 case OC_REP_INT_ARRAY:
-                    properties.put(ocRepresentation.getName(), OCRepUtil.ocArrayToIntArray(ocRepresentation.getValue().getArray()));
+                    properties.put(ocRepresentation.getName(), OCRep.ocArrayToLongArray(ocRepresentation.getValue().getArray()));
                     break;
                 case OC_REP_DOUBLE:
                     properties.put(ocRepresentation.getName(), ocRepresentation.getValue().getDouble());
                     break;
                 case OC_REP_DOUBLE_ARRAY:
-                    properties.put(ocRepresentation.getName(), OCRepUtil.ocArrayToDoubleArray(ocRepresentation.getValue().getArray()));
+                    properties.put(ocRepresentation.getName(), OCRep.ocArrayToDoubleArray(ocRepresentation.getValue().getArray()));
                     break;
                 default:
                     break;

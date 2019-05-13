@@ -20,11 +20,11 @@
 package org.openconnectivity.otgc.domain.usecase.credential;
 
 import io.reactivex.Completable;
-import org.iotivity.OCDosType;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.data.repository.PstatRepository;
 import org.openconnectivity.otgc.data.repository.CmsRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 
 import javax.inject.Inject;
 
@@ -49,12 +49,12 @@ public class DeleteCredentialUseCase {
      * 3.   POST    /oic/sec/pstat  -> dos.s=3
      */
 
-    public Completable execute(Device device, int credId) {
+    public Completable execute(Device device, long credId) {
         return iotivityRepository.getSecureEndpoint(device)
                 .flatMapCompletable(endpoint ->
-                        mPstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                        mPstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                         .andThen(mCmsRepository.deleteCredential(endpoint, credId))
-                        .andThen(mPstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP)));
+                        .andThen(mPstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP)));
     }
 
 }

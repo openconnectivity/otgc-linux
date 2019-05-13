@@ -20,7 +20,7 @@
 package org.openconnectivity.otgc.domain.usecase.client;
 
 import io.reactivex.Single;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -81,7 +81,7 @@ public class IntrospectUseCase {
                     break;
                 case OC_REP_STRING_ARRAY:
                     JSONArray strArray = new JSONArray();
-                    String[] values = OCRepUtil.ocArrayToStringArray(rep.getValue().getArray());
+                    String[] values = OCRep.ocArrayToStringArray(rep.getValue().getArray());
                     for (String value : values) {
                         strArray.put(value);
                     }

@@ -27,10 +27,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableBooleanValue;
 import org.apache.log4j.Logger;
-import org.iotivity.OCOxmType;
 import org.openconnectivity.otgc.utils.constant.NotificationKey;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.domain.model.devicelist.DeviceType;
+import org.openconnectivity.otgc.utils.constant.OcfOxmType;
 import org.openconnectivity.otgc.utils.rx.SchedulersFacade;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.domain.usecase.*;
@@ -241,7 +241,7 @@ public class ToolbarViewModel implements ViewModel {
     }
 
     public interface SelectOxMListener {
-        OCOxmType onGetOxM(List<OCOxmType> supportedOxm);
+        OcfOxmType onGetOxM(List<OcfOxmType> supportedOxm);
     }
 }
 

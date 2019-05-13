@@ -43,6 +43,7 @@ import org.openconnectivity.otgc.utils.constant.OcfEncoding;
 import org.openconnectivity.otgc.domain.model.resource.secure.csr.OcCsr;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.ByteArrayInputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -55,6 +56,7 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.util.Date;
 
+@Singleton
 public class CertRepository {
 
     @Inject

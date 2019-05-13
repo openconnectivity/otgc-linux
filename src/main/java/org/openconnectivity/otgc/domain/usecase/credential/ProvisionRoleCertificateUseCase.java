@@ -22,10 +22,9 @@ package org.openconnectivity.otgc.domain.usecase.credential;
 import io.reactivex.Completable;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.iotivity.OCDosType;
 import org.openconnectivity.otgc.data.repository.*;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 import org.openconnectivity.otgc.utils.constant.OtgcConstant;
-import org.openconnectivity.otgc.domain.model.resource.secure.csr.OcCsr;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 
 import javax.inject.Inject;
@@ -64,7 +63,7 @@ public class ProvisionRoleCertificateUseCase {
     public Completable execute(Device device, String roleId, String roleAuthority) {
         return iotivityRepository.getSecureEndpoint(device)
                 .flatMapCompletable(endpoint ->
-                        pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                        pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                         .andThen(cmsRepository.retrieveCsr(endpoint))
                         .flatMapCompletable(csr -> {
                             // Convert CSR
@@ -82,6 +81,6 @@ public class ProvisionRoleCertificateUseCase {
 
                             return cmsRepository.provisionRoleCertificate(endpoint, device.getDeviceId(), roleCert, roleId, roleAuthority);
                         })
-                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP)));
+                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP)));
     }
 }

@@ -44,6 +44,4 @@ public class ObserveResourceUseCase {
                 .flatMapObservable(endpoint -> resourceRepository.observeResource(endpoint, resource));
 
     }
-
-
 }

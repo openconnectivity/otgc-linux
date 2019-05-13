@@ -20,8 +20,6 @@
 package org.openconnectivity.otgc.domain.usecase.link;
 
 import io.reactivex.Completable;
-import org.iotivity.OCCredType;
-import org.iotivity.OCDosType;
 import org.openconnectivity.otgc.data.repository.CmsRepository;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.data.repository.ProvisionRepository;
@@ -29,6 +27,8 @@ import org.openconnectivity.otgc.data.repository.PstatRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.domain.model.resource.secure.acl.OcAce;
 import org.openconnectivity.otgc.domain.model.resource.secure.cred.OcCredential;
+import org.openconnectivity.otgc.utils.constant.OcfCredType;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -57,10 +57,10 @@ public class UnlinkDevicesUseCase {
                                             List<Completable> deleteCredList = new ArrayList<>();
                                             for(OcCredential cred : ocCredentials.getCredList()) {
                                                 if (cred.getSubjectuuid() != null && cred.getSubjectuuid().equals(server.getDeviceId())
-                                                        && cred.getCredtype() == OCCredType.OC_CREDTYPE_PSK) {
-                                                    Completable deleteCred = pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                                                        && cred.getCredtype() == OcfCredType.OC_CREDTYPE_PSK) {
+                                                    Completable deleteCred = pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                                                             .andThen(cmsRepository.deleteCredential(endpoint, cred.getCredid()))
-                                                            .andThen(pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP));
+                                                            .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP));
                                                     deleteCredList.add(deleteCred);
                                                 }
                                             }
@@ -73,10 +73,10 @@ public class UnlinkDevicesUseCase {
                             List<Completable> deleteCredList = new ArrayList<>();
                             for(OcCredential cred : ocCredentials.getCredList()) {
                                 if (cred.getSubjectuuid() != null && cred.getSubjectuuid().equals(client.getDeviceId())
-                                        && cred.getCredtype() == OCCredType.OC_CREDTYPE_PSK) {
-                                    Completable deleteCred = pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                                        && cred.getCredtype() == OcfCredType.OC_CREDTYPE_PSK) {
+                                    Completable deleteCred = pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                                             .andThen(cmsRepository.deleteCredential(endpoint, cred.getCredid()))
-                                            .andThen(pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP));
+                                            .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP));
                                     deleteCredList.add(deleteCred);
                                 }
                             }

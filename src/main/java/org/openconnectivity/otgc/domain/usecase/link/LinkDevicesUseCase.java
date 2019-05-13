@@ -20,11 +20,11 @@
 package org.openconnectivity.otgc.domain.usecase.link;
 
 import io.reactivex.Completable;
-import org.iotivity.OCDosType;
 import org.openconnectivity.otgc.data.repository.CmsRepository;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.data.repository.PstatRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -55,15 +55,15 @@ public class LinkDevicesUseCase {
 
         Completable clientPairwise = iotivityRepository.getSecureEndpoint(client)
                 .flatMapCompletable(endpoint ->
-                        pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                        pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                         .andThen(cmsRepository.createPskCredential(endpoint, server.getDeviceId(), secretKey.getEncoded()))
-                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP)));
+                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP)));
 
         Completable serverPairwise = iotivityRepository.getSecureEndpoint(server)
                 .flatMapCompletable(endpoint ->
-                        pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                        pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                         .andThen(cmsRepository.createPskCredential(endpoint, client.getDeviceId(), secretKey.getEncoded()))
-                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP)));
+                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP)));
 
         return clientPairwise
                 .andThen(serverPairwise);

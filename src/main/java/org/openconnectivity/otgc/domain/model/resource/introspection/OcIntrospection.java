@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.model.resource.introspection;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
@@ -49,7 +49,7 @@ public class OcIntrospection extends OcResourceBase {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* urlinfo */
-        OCRepresentation urlInfoObjArray = OCRepUtil.repGetObjectArray(rep, OcfResourceAttributeKey.URL_INFO_KEY);
+        OCRepresentation urlInfoObjArray = OCRep.getObjectArray(rep, OcfResourceAttributeKey.URL_INFO_KEY);
         List<OcIntrospectionUrlInfo> urlInfoList = new ArrayList<>();
         while (urlInfoObjArray != null) {
             OcIntrospectionUrlInfo urlInfo = new OcIntrospectionUrlInfo();
@@ -61,16 +61,16 @@ public class OcIntrospection extends OcResourceBase {
         this.setUrlInfo(urlInfoList);
 
         /* id */
-        String id = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ID_KEY);
+        String id = OCRep.getString(rep, OcfResourceAttributeKey.ID_KEY);
         this.setId(id);
         /* n */
-        String n = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.NAME_KEY);
+        String n = OCRep.getString(rep, OcfResourceAttributeKey.NAME_KEY);
         this.setName(n);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(resourceTypes != null ? Arrays.asList(resourceTypes) : null);
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(interfaces != null ? Arrays.asList(interfaces) : null);
     }
 

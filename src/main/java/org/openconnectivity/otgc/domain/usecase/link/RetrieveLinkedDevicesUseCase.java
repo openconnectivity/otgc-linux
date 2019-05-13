@@ -20,11 +20,11 @@
 package org.openconnectivity.otgc.domain.usecase.link;
 
 import io.reactivex.Single;
-import org.iotivity.OCCredType;
 import org.openconnectivity.otgc.data.repository.CmsRepository;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.domain.model.resource.secure.cred.OcCredential;
+import org.openconnectivity.otgc.utils.constant.OcfCredType;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class RetrieveLinkedDevicesUseCase {
                     List<String> creds = new ArrayList<>();
                     for (OcCredential cred : ocCredentials.getCredList()) {
                         if (cred.getSubjectuuid() != null
-                                && cred.getCredtype() == OCCredType.OC_CREDTYPE_PSK) {
+                                && cred.getCredtype() == OcfCredType.OC_CREDTYPE_PSK) {
                             creds.add(cred.getSubjectuuid());
                         }
                     }

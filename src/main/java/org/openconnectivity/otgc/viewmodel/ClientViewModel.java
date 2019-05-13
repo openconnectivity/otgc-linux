@@ -76,6 +76,7 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
     private final ObserveResourceUseCase observeResourceUseCase;
     private final CancelObserveResourceUseCase cancelObserveResourceUseCase;
     private final CancelAllObserveResourceUseCase cancelAllObserveResourceUseCase;
+    private final UpdateDeviceTypeUseCase updateDeviceTypeUseCase;
 
     // Observable responses
     private final ObjectProperty<Response<OcDeviceInfo>> deviceInfoResponse = new SimpleObjectProperty<>();
@@ -104,7 +105,8 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
                            PostRequestUseCase postRequestUseCase,
                            ObserveResourceUseCase observeResourceUseCase,
                            CancelObserveResourceUseCase cancelObserveResourceUseCase,
-                           CancelAllObserveResourceUseCase cancelAllObserveResourceUseCase) {
+                           CancelAllObserveResourceUseCase cancelAllObserveResourceUseCase,
+                           UpdateDeviceTypeUseCase updateDeviceTypeUseCase) {
         this.schedulersFacade = schedulersFacade;
         this.getDeviceInfoUseCase = getDeviceInfoUseCase;
         this.getPlatformInfoUseCase = getPlatformInfoUseCase;
@@ -116,6 +118,7 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
         this.observeResourceUseCase = observeResourceUseCase;
         this.cancelObserveResourceUseCase = cancelObserveResourceUseCase;
         this.cancelAllObserveResourceUseCase = cancelAllObserveResourceUseCase;
+        this.updateDeviceTypeUseCase = updateDeviceTypeUseCase;
     }
 
     public void initialize() {
@@ -167,8 +170,7 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
 
     public ObservableBooleanValue clientVisibleProperty() {
         return Bindings.createBooleanBinding(() -> deviceProperty.get() != null
-                && (deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_SELF
-                || deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_OTHER), deviceProperty);
+                    && deviceProperty.get().getDeviceType() != DeviceType.UNOWNED, deviceProperty);
     }
 
     public void loadInfoDevice(ObservableValue<? extends Device> observable, Device oldValue, Device newValue) {
@@ -179,8 +181,7 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
             cancellAllObserveResource();
         }
 
-        if ((newValue != null) && (newValue.getDeviceType() == DeviceType.OWNED_BY_SELF
-                || newValue.getDeviceType() == DeviceType.OWNED_BY_OTHER)) {
+        if ((newValue != null) && newValue.getDeviceType() != DeviceType.UNOWNED) {
 
             // Load Info
             loadDeviceInfo(newValue);
@@ -193,8 +194,7 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
 
     public void loadGenericClient(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         if (newValue != null  && newValue.equals(resourceBundle.getString("client.tab.generic_client")) && deviceProperty.get() != null
-            && (deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_SELF
-                || deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_OTHER)){
+            && deviceProperty.get().getDeviceType() != DeviceType.UNOWNED){
             introspect(deviceProperty.get());
         }
     }
@@ -313,8 +313,39 @@ public class ClientViewModel implements ViewModel, SceneLifecycle {
                 .subscribeOn(schedulersFacade.io())
                 .observeOn(schedulersFacade.ui())
                 .subscribe(
-                        resource1 -> getRequestResponse.setValue(Response.success(resource)),
-                        throwable -> getRequestResponse.setValue(Response.error(throwable))
+                        res -> {
+                            getRequestResponse.setValue(Response.success(res));
+
+                            if (!device.hasDOXSpermit()
+                                    && (device.getDeviceType() == DeviceType.OWNED_BY_OTHER
+                                    || device.getDeviceType() == DeviceType.OWNED_BY_OTHER_WITH_PERMITS)) {
+                                disposables.add(updateDeviceTypeUseCase.execute(device.getDeviceId(),
+                                        DeviceType.OWNED_BY_OTHER_WITH_PERMITS,
+                                        device.getPermits() | Device.DOXS_PERMITS)
+                                        .subscribeOn(schedulersFacade.io())
+                                        .observeOn(schedulersFacade.ui())
+                                        .subscribe(
+                                                () -> deviceListToolbarDetailScope.publish(NotificationKey.UPDATE_DEVICE_TYPE, device),
+                                                throwable -> getRequestResponse.setValue(Response.error(throwable))
+                                        ));
+
+                            }
+                        },
+                        throwable -> {
+                            getRequestResponse.setValue(Response.error(throwable));
+
+                            if (device.hasDOXSpermit()) {
+                                disposables.add(updateDeviceTypeUseCase.execute(device.getDeviceId(),
+                                        DeviceType.OWNED_BY_OTHER,
+                                        device.getPermits() & ~Device.DOXS_PERMITS)
+                                        .subscribeOn(schedulersFacade.io())
+                                        .observeOn(schedulersFacade.ui())
+                                        .subscribe(
+                                                () -> deviceListToolbarDetailScope.publish(NotificationKey.UPDATE_DEVICE_TYPE, device),
+                                                throwable2 -> getRequestResponse.setValue(Response.error(throwable2))
+                                        ));
+                            }
+                        }
                 ));
     }
 

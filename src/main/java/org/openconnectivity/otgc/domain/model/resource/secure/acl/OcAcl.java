@@ -20,25 +20,22 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.acl;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
+import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class OcAcl {
+public class OcAcl extends OcResourceBase {
 
     private List<OcAce> aceList;
     private String rownerUuid;
-    private List<String> resourceTypes;
-    private List<String> interfaces;
 
     public OcAcl() {
         this.aceList = new ArrayList<>();
-        this.resourceTypes = new ArrayList<>();
-        this.interfaces = new ArrayList<>();
     }
 
     public List<OcAce> getAceList() {
@@ -57,25 +54,9 @@ public class OcAcl {
         this.rownerUuid = rownerUuid;
     }
 
-    public List<String> getResourceTypes() {
-        return this.resourceTypes;
-    }
-
-    public void setResourceTypes(List<String> resourceTypes) {
-        this.resourceTypes = resourceTypes;
-    }
-
-    public List<String> getInterfaces() {
-        return this.interfaces;
-    }
-
-    public void setInterfaces(List<String> interfaces) {
-        this.interfaces = interfaces;
-    }
-
     public void parseOCRepresentation(OCRepresentation rep) {
         /* aclist2 */
-        OCRepresentation aclist2Obj = OCRepUtil.repGetObjectArray(rep, OcfResourceAttributeKey.ACE_LIST_KEY);
+        OCRepresentation aclist2Obj = OCRep.getObjectArray(rep, OcfResourceAttributeKey.ACE_LIST_KEY);
         List<OcAce> aceList = new ArrayList<>();
         while (aclist2Obj != null) {
             OcAce ace = new OcAce();
@@ -85,49 +66,49 @@ public class OcAcl {
         }
         this.setAceList(aceList);
         /* rowneruuid */
-        String rowneruuid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ROWNER_UUID_KEY);
+        String rowneruuid = OCRep.getString(rep, OcfResourceAttributeKey.ROWNER_UUID_KEY);
         this.setRownerUuid(rowneruuid);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(Arrays.asList(resourceTypes));
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(Arrays.asList(interfaces));
     }
 
     public CborEncoder parseToCbor() {
-        CborEncoder root = OCRepUtil.repBeginRootObject();
+        CborEncoder root = OCRep.beginRootObject();
 
         /* aclist2 */
         if (this.getAceList() != null && !this.getAceList().isEmpty()) {
-            CborEncoder aclist2 = OCRepUtil.repOpenArray(root, OcfResourceAttributeKey.ACE_LIST_KEY);
+            CborEncoder aclist2 = OCRep.openArray(root, OcfResourceAttributeKey.ACE_LIST_KEY);
             for (OcAce ace : this.getAceList()) {
                 ace.parseToCbor(aclist2);
             }
-            OCRepUtil.repCloseArray(root, aclist2);
+            OCRep.closeArray(root, aclist2);
         }
 
         if (this.getRownerUuid() != null && !this.getRownerUuid().isEmpty()) {
-            OCRepUtil.repSetTextString(root, OcfResourceAttributeKey.ROWNER_UUID_KEY, this.getRownerUuid());
+            OCRep.setTextString(root, OcfResourceAttributeKey.ROWNER_UUID_KEY, this.getRownerUuid());
         }
 
         if (this.getResourceTypes() != null && !this.getResourceTypes().isEmpty()) {
-            CborEncoder resourceType = OCRepUtil.repOpenArray(root, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+            CborEncoder resourceType = OCRep.openArray(root, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
             for (String rtStr : this.getResourceTypes()) {
-                OCRepUtil.repAddTextString(resourceType, rtStr);
+                OCRep.addTextString(resourceType, rtStr);
             }
-            OCRepUtil.repCloseArray(root, resourceType);
+            OCRep.closeArray(root, resourceType);
         }
 
         if (this.getInterfaces() != null && !this.getInterfaces().isEmpty()) {
-            CborEncoder interfaces = OCRepUtil.repOpenArray(root, OcfResourceAttributeKey.INTERFACES_KEY);
+            CborEncoder interfaces = OCRep.openArray(root, OcfResourceAttributeKey.INTERFACES_KEY);
             for (String ifStr : this.getInterfaces()) {
-                OCRepUtil.repAddTextString(interfaces, ifStr);
+                OCRep.addTextString(interfaces, ifStr);
             }
-            OCRepUtil.repCloseArray(root, interfaces);
+            OCRep.closeArray(root, interfaces);
         }
 
-        OCRepUtil.repEndRootObject();
+        OCRep.endRootObject();
 
         return root;
     }

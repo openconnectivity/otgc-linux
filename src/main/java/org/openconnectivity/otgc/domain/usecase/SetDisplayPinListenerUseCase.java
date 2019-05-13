@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.usecase;
 
-import org.iotivity.OCDisplayRandomPinHandler;
+import org.iotivity.OCRandomPinHandler;
 import org.openconnectivity.otgc.data.repository.DoxsRepository;
 
 import javax.inject.Inject;
@@ -32,7 +32,7 @@ public class SetDisplayPinListenerUseCase {
         this.doxsRepository = doxsRepository;
     }
 
-    public void execute(OCDisplayRandomPinHandler displayPinListener) {
+    public void execute(OCRandomPinHandler displayPinListener) {
         doxsRepository.setDisplayPinListener(displayPinListener);
     }
 }

@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.model.resource.virtual.p;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
@@ -156,56 +156,56 @@ public class OcPlatformInfo extends OcResourceBase {
 
     public void setOCRepresentation(OCRepresentation rep) {
         /* pi */
-        String pi = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.PLATFORM_ID_KEY);
+        String pi = OCRep.getString(rep, OcfResourceAttributeKey.PLATFORM_ID_KEY);
         this.setPlatformId(pi);
         /* mnfv */
-        String mnfv = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_FW_VER_KEY);
+        String mnfv = OCRep.getString(rep, OcfResourceAttributeKey.MAN_FW_VER_KEY);
         this.setManufacturerFwVersion(mnfv);
         /* vid */
-        String vid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_INFO);
+        String vid = OCRep.getString(rep, OcfResourceAttributeKey.MAN_INFO);
         this.setManufacturerInfo(vid);
         /* mnmn */
-        String mnmn = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_NAME_KEY);
+        String mnmn = OCRep.getString(rep, OcfResourceAttributeKey.MAN_NAME_KEY);
         this.setManufacturerName(mnmn);
         /* mnmo */
-        String mnmo = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_MODEL_NO_KEY);
+        String mnmo = OCRep.getString(rep, OcfResourceAttributeKey.MAN_MODEL_NO_KEY);
         this.setManufacturerModelNumber(mnmo);
         /* mnhw */
-        String mnhw = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_HW_VER_KEY);
+        String mnhw = OCRep.getString(rep, OcfResourceAttributeKey.MAN_HW_VER_KEY);
         this.setManufacturerHwVersion(mnhw);
         /* mnos */
-        String mnos = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_OS_VER_KEY);
+        String mnos = OCRep.getString(rep, OcfResourceAttributeKey.MAN_OS_VER_KEY);
         this.setManufacturerOsVersion(mnos);
         /* mndt */
-        String mndt = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_DATE_KEY);
+        String mndt = OCRep.getString(rep, OcfResourceAttributeKey.MAN_DATE_KEY);
         this.setManufacturedDate(mndt);
         /* mnsl */
-        String mnsl = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_SUPPORT_URL_KEY);
+        String mnsl = OCRep.getString(rep, OcfResourceAttributeKey.MAN_SUPPORT_URL_KEY);
         this.setManufacturerSupportUrl(mnsl);
         /* mnpv */
-        String mnpv = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_PLATFORM_VER_KEY);
+        String mnpv = OCRep.getString(rep, OcfResourceAttributeKey.MAN_PLATFORM_VER_KEY);
         this.setManufacturerPlatformVersion(mnpv);
         /* st */
-        String st = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_SYSTEM_TIME_KEY);
+        String st = OCRep.getString(rep, OcfResourceAttributeKey.MAN_SYSTEM_TIME_KEY);
         this.setManufacturerSystemTime(st);
         /* mnml */
-        String mnml = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_URL_KEY);
+        String mnml = OCRep.getString(rep, OcfResourceAttributeKey.MAN_URL_KEY);
         this.setManufacturerUrl(mnml);
         /* mnsel */
-        String mnsel = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.MAN_SERIAL_NO);
+        String mnsel = OCRep.getString(rep, OcfResourceAttributeKey.MAN_SERIAL_NO);
         this.setManufacturerSerialNumber(mnsel);
 
         /* id */
-        String id = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ID_KEY);
+        String id = OCRep.getString(rep, OcfResourceAttributeKey.ID_KEY);
         this.setId(id);
         /* n */
-        String n = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.NAME_KEY);
+        String n = OCRep.getString(rep, OcfResourceAttributeKey.NAME_KEY);
         this.setName(n);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(resourceTypes != null ? Arrays.asList(resourceTypes) : null);
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(interfaces != null ? Arrays.asList(interfaces) : null);
     }
 

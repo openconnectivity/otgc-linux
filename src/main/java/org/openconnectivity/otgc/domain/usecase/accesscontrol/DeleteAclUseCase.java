@@ -20,11 +20,11 @@
 package org.openconnectivity.otgc.domain.usecase.accesscontrol;
 
 import io.reactivex.Completable;
-import org.iotivity.OCDosType;
 import org.openconnectivity.otgc.data.repository.AmsRepository;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.data.repository.PstatRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 
 import javax.inject.Inject;
 
@@ -42,11 +42,11 @@ public class DeleteAclUseCase {
         this.pstatRepository = pstatRepository;
     }
 
-    public Completable execute(Device device, int aceId) {
+    public Completable execute(Device device, long aceId) {
         return iotivityRepository.getSecureEndpoint(device)
                 .flatMapCompletable(endpoint ->
-                        pstatRepository.changeDeviceStatus(device.getIpv6SecureHost(), OCDosType.OC_DOS_RFPRO)
+                        pstatRepository.changeDeviceStatus(device.getIpv6SecureHost(), OcfDosType.OC_DOSTYPE_RFPRO)
                         .andThen(amsRepository.deleteAcl(device.getIpv6SecureHost(), aceId))
-                        .andThen(pstatRepository.changeDeviceStatus(device.getIpv6SecureHost(), OCDosType.OC_DOS_RFNOP)));
+                        .andThen(pstatRepository.changeDeviceStatus(device.getIpv6SecureHost(), OcfDosType.OC_DOSTYPE_RFNOP)));
     }
 }

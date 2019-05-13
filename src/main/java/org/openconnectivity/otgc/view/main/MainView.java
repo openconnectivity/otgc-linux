@@ -34,9 +34,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.StatusBar;
-import org.iotivity.OCDisplayRandomPinHandler;
-import org.iotivity.OCSetRandomPinHandler;
+import org.iotivity.OCRandomPinHandler;
 import org.openconnectivity.otgc.utils.constant.NotificationKey;
+import org.openconnectivity.otgc.utils.handler.OCSetRandomPinHandler;
 import org.openconnectivity.otgc.utils.util.Toast;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.utils.viewmodel.Status;
@@ -130,7 +130,7 @@ public class MainView implements FxmlView<MainViewModel>, Initializable {
         return verifyPin;
     };
 
-    OCDisplayRandomPinHandler displayPinListener = pin -> {
+    OCRandomPinHandler displayPinListener = pin -> {
         LOG.debug("Inside displayPinListener");
         Platform.runLater(() -> {
             ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);

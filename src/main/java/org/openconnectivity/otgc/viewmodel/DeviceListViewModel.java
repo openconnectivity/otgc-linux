@@ -24,15 +24,12 @@ import de.saxsys.mvvmfx.ViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import org.openconnectivity.otgc.domain.usecase.*;
 import org.openconnectivity.otgc.utils.constant.NotificationKey;
-import org.openconnectivity.otgc.domain.usecase.GetDeviceInfoUseCase;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.utils.rx.SchedulersFacade;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.domain.model.devicelist.DeviceType;
-import org.openconnectivity.otgc.domain.usecase.GetDeviceNameUseCase;
-import org.openconnectivity.otgc.domain.usecase.GetDeviceRoleUseCase;
-import org.openconnectivity.otgc.domain.usecase.ScanDevicesUseCase;
 import org.openconnectivity.otgc.utils.scopes.DeviceListToolbarDetailScope;
 
 import javax.inject.Inject;
@@ -50,10 +47,12 @@ public class DeviceListViewModel implements ViewModel {
     private final GetDeviceInfoUseCase getDeviceInfoUseCase;
     private final GetDeviceNameUseCase getDeviceNameUseCase;
     private final GetDeviceRoleUseCase getDeviceRoleUseCase;
+    private final GetDeviceDatabaseUseCase getDeviceDatabaseUseCase;
 
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     // Observable responses
+    private final ObjectProperty<Response<Device>> updateDeviceResponse = new SimpleObjectProperty<>();
     private final ObjectProperty<Response<Device>> scanResponse = new SimpleObjectProperty<>();
 
     private ListProperty<Device> devicesList = new SimpleListProperty<>();
@@ -79,6 +78,7 @@ public class DeviceListViewModel implements ViewModel {
         // Notification subscribe
         deviceListToolbarDetailScope.subscribe(NotificationKey.SCAN_DEVICES, ((key, payload) -> onDiscoverRequest()));
         deviceListToolbarDetailScope.subscribe(NotificationKey.UPDATE_DEVICE, (key, payload) -> updateItem((int) payload[0], (Device) payload[1]));
+        deviceListToolbarDetailScope.subscribe(NotificationKey.UPDATE_DEVICE_TYPE, (key, payload) -> updateDevice((Device)payload[0]));
     }
 
     @Inject
@@ -86,16 +86,22 @@ public class DeviceListViewModel implements ViewModel {
                                ScanDevicesUseCase scanDevicesUseCase,
                                GetDeviceInfoUseCase getDeviceInfoUseCase,
                                GetDeviceNameUseCase getDeviceNameUseCase,
-                               GetDeviceRoleUseCase getDeviceRoleUseCase) {
+                               GetDeviceRoleUseCase getDeviceRoleUseCase,
+                               GetDeviceDatabaseUseCase getDeviceDatabaseUseCase) {
         this.schedulersFacade = schedulersFacade;
         this.scanDevicesUseCase = scanDevicesUseCase;
         this.getDeviceInfoUseCase = getDeviceInfoUseCase;
         this.getDeviceNameUseCase = getDeviceNameUseCase;
         this.getDeviceRoleUseCase = getDeviceRoleUseCase;
+        this.getDeviceDatabaseUseCase = getDeviceDatabaseUseCase;
     }
 
     public ObjectProperty<Response<Device>> scanResponseProperty() {
         return scanResponse;
+    }
+
+    public ObjectProperty<Response<Device>> updateDeviceResponseProperty() {
+        return updateDeviceResponse;
     }
 
     public List<Device> getDevicesList() {
@@ -147,6 +153,16 @@ public class DeviceListViewModel implements ViewModel {
             .subscribe(
                     device -> scanResponse.setValue(Response.success(device)),
                     throwable -> scanResponse.setValue(Response.error(throwable))
+            ));
+    }
+
+    public void updateDevice(Device device) {
+        disposables.add(getDeviceDatabaseUseCase.execute(device)
+            .subscribeOn(schedulersFacade.io())
+            .observeOn(schedulersFacade.ui())
+            .subscribe(
+                    device1 -> updateDeviceResponse.setValue(Response.success(device1)),
+                    throwable -> {}
             ));
     }
 

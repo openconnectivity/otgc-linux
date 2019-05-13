@@ -20,12 +20,12 @@
 package org.openconnectivity.otgc.domain.usecase.link;
 
 import io.reactivex.Completable;
-import org.iotivity.OCDosType;
 import org.openconnectivity.otgc.data.repository.AmsRepository;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
 import org.openconnectivity.otgc.data.repository.PstatRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.domain.model.resource.secure.acl.OcAce;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -53,9 +53,9 @@ public class UnlinkRoleForServerUseCase {
                             List<Completable> deleteAceList = new ArrayList<>();
                             for (OcAce ace : ocAcl.getAceList()) {
                                 if (ace.getSubject().getRoleId() != null && ace.getSubject().getRoleId().equals(roleId)) {
-                                    Completable deleteAce = pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFPRO)
+                                    Completable deleteAce = pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
                                                             .andThen(amsRepository.deleteAcl(endpoint, ace.getAceid()))
-                                                            .andThen(pstatRepository.changeDeviceStatus(endpoint, OCDosType.OC_DOS_RFNOP));
+                                                            .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP));
                                     deleteAceList.add(deleteAce);
                                 }
                             }

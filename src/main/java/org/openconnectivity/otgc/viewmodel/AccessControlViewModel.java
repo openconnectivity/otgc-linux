@@ -30,10 +30,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import org.openconnectivity.otgc.domain.model.resource.secure.acl.OcAce;
 import org.openconnectivity.otgc.domain.model.resource.secure.acl.OcAcl;
+import org.openconnectivity.otgc.domain.usecase.UpdateDeviceTypeUseCase;
 import org.openconnectivity.otgc.domain.usecase.accesscontrol.CreateAclUseCase;
 import org.openconnectivity.otgc.domain.usecase.accesscontrol.DeleteAclUseCase;
 import org.openconnectivity.otgc.domain.usecase.accesscontrol.RetrieveAclUseCase;
 import org.openconnectivity.otgc.domain.usecase.RetrieveVerticalResourcesUseCase;
+import org.openconnectivity.otgc.utils.constant.NotificationKey;
 import org.openconnectivity.otgc.utils.rx.SchedulersFacade;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
@@ -64,11 +66,12 @@ public class AccessControlViewModel implements ViewModel {
     private final CreateAclUseCase createAclUseCase;
     private final DeleteAclUseCase deleteAclUseCase;
     private final RetrieveVerticalResourcesUseCase retrieveVerticalResourcesUseCase;
+    private final UpdateDeviceTypeUseCase updateDeviceTypeUseCase;
 
     // Observable responses
     private final ObjectProperty<Response<OcAcl>> retrieveAclResponse = new SimpleObjectProperty<>();
     private final ObjectProperty<Response<Boolean>> createAclResponse = new SimpleObjectProperty<>();
-    private final ObjectProperty<Response<Integer>> deleteAclResponse = new SimpleObjectProperty<>();
+    private final ObjectProperty<Response<Long>> deleteAclResponse = new SimpleObjectProperty<>();
     private final ObjectProperty<Response<List<String>>> retrieveVerticalResourcesResponse = new SimpleObjectProperty<>();
 
     private ListProperty<OcAce> aceList = new SimpleListProperty<>();
@@ -88,12 +91,14 @@ public class AccessControlViewModel implements ViewModel {
                                   RetrieveAclUseCase retrieveAclUseCase,
                                   CreateAclUseCase createAclUseCase,
                                   DeleteAclUseCase deleteAclUseCase,
-                                  RetrieveVerticalResourcesUseCase retrieveVerticalResourcesUseCase) {
+                                  RetrieveVerticalResourcesUseCase retrieveVerticalResourcesUseCase,
+                                  UpdateDeviceTypeUseCase updateDeviceTypeUseCase) {
         this.schedulersFacade = schedulersFacade;
         this.retrieveAclUseCase = retrieveAclUseCase;
         this.createAclUseCase = createAclUseCase;
         this.deleteAclUseCase = deleteAclUseCase;
         this.retrieveVerticalResourcesUseCase = retrieveVerticalResourcesUseCase;
+        this.updateDeviceTypeUseCase = updateDeviceTypeUseCase;
     }
 
     public void initialize() {
@@ -105,8 +110,7 @@ public class AccessControlViewModel implements ViewModel {
 
     public ObservableBooleanValue amsVisibleProperty() {
         return Bindings.createBooleanBinding(() -> deviceProperty.get() != null
-                && (deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_SELF
-                        || deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_OTHER), deviceProperty);
+                    && deviceProperty.get().getDeviceType() != DeviceType.UNOWNED, deviceProperty);
     }
 
     public ObjectProperty<Response<OcAcl>> retrieveAclResponseProperty() {
@@ -117,7 +121,7 @@ public class AccessControlViewModel implements ViewModel {
         return createAclResponse;
     }
 
-    public ObjectProperty<Response<Integer>> deleteAclResponseProperty() {
+    public ObjectProperty<Response<Long>> deleteAclResponseProperty() {
         return deleteAclResponse;
     }
 
@@ -131,9 +135,8 @@ public class AccessControlViewModel implements ViewModel {
         verticalResourceListProperty().clear();
         selectedVerticalResource.clear();
 
-        if (selectedTabProperty().get() != null && selectedTabProperty().get().equals(resourceBundle.getString("client.tab.ams")) && (newValue != null)
-                && (newValue.getDeviceType() == DeviceType.OWNED_BY_SELF
-                    || newValue.getDeviceType() == DeviceType.OWNED_BY_OTHER)) {
+        if (selectedTabProperty().get() != null && selectedTabProperty().get().equals(resourceBundle.getString("client.tab.ams"))
+                && newValue != null && newValue.getDeviceType() != DeviceType.UNOWNED) {
             retrieveAcl(newValue);
             retrieveVerticalResources(newValue);
         }
@@ -146,8 +149,7 @@ public class AccessControlViewModel implements ViewModel {
         selectedVerticalResource.clear();
 
         if (newValue != null && newValue.equals(resourceBundle.getString("client.tab.ams")) && deviceProperty.get() != null
-                && (deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_SELF
-                    || deviceProperty.get().getDeviceType() == DeviceType.OWNED_BY_OTHER)) {
+                && deviceProperty.get().getDeviceType() != DeviceType.UNOWNED) {
             retrieveAcl(deviceProperty.get());
             retrieveVerticalResources(deviceProperty.get());
         }
@@ -159,8 +161,38 @@ public class AccessControlViewModel implements ViewModel {
                 .observeOn(schedulersFacade.ui())
                 .doOnSubscribe(__ -> retrieveAclResponse.setValue(Response.loading()))
                 .subscribe(
-                        acl -> retrieveAclResponse.setValue(Response.success(acl)),
-                        throwable -> retrieveAclResponse.setValue(Response.error(throwable))
+                        acl -> {
+                            retrieveAclResponse.setValue(Response.success(acl));
+
+                            if (!device.hasACLpermit()
+                                    && (device.getDeviceType() == DeviceType.OWNED_BY_OTHER
+                                    || device.getDeviceType() == DeviceType.OWNED_BY_OTHER_WITH_PERMITS)) {
+                                disposable.add(updateDeviceTypeUseCase.execute(device.getDeviceId(),
+                                                                                DeviceType.OWNED_BY_OTHER_WITH_PERMITS,
+                                                                                device.getPermits() | Device.ACL_PERMITS)
+                                                .subscribeOn(schedulersFacade.io())
+                                                .observeOn(schedulersFacade.ui())
+                                                .subscribe(
+                                                        () -> deviceListToolbarDetailScope.publish(NotificationKey.UPDATE_DEVICE_TYPE, device),
+                                                        throwable -> retrieveAclResponse.setValue(Response.error(throwable))
+                                                ));
+                            }
+                        },
+                        throwable -> {
+                            retrieveAclResponse.setValue(Response.error(throwable));
+
+                            if (device.hasACLpermit()) {
+                                disposable.add(updateDeviceTypeUseCase.execute(device.getDeviceId(),
+                                        DeviceType.OWNED_BY_OTHER,
+                                        device.getPermits() & ~Device.ACL_PERMITS)
+                                        .subscribeOn(schedulersFacade.io())
+                                        .observeOn(schedulersFacade.ui())
+                                        .subscribe(
+                                                () -> deviceListToolbarDetailScope.publish(NotificationKey.UPDATE_DEVICE_TYPE, device),
+                                                throwable2 ->  retrieveAclResponse.setValue(Response.error(throwable))
+                                        ));
+                            }
+                        }
                 )
         );
     }
@@ -213,7 +245,7 @@ public class AccessControlViewModel implements ViewModel {
         this.aceListProperty().setValue(FXCollections.observableArrayList(aceList));
     }
 
-    public void createAce(String subjectId, int permission) {
+    public void createAce(String subjectId, long permission) {
         disposable.add(createAclUseCase.execute(deviceProperty.get(), subjectId, selectedVerticalResource, permission)
                 .subscribeOn(schedulersFacade.io())
                 .observeOn(schedulersFacade.ui())
@@ -225,7 +257,7 @@ public class AccessControlViewModel implements ViewModel {
         );
     }
 
-    public void createAce(String roleId, String roleAuthority, int permission) {
+    public void createAce(String roleId, String roleAuthority, long permission) {
         disposable.add(createAclUseCase.execute(deviceProperty.get(), roleId, roleAuthority, selectedVerticalResource, permission)
                 .subscribeOn(schedulersFacade.io())
                 .observeOn(schedulersFacade.ui())
@@ -237,7 +269,7 @@ public class AccessControlViewModel implements ViewModel {
         );
     }
 
-    public void createAce(boolean isAuth, int permission) {
+    public void createAce(boolean isAuth, long permission) {
         disposable.add(createAclUseCase.execute(deviceProperty.get(), isAuth, selectedVerticalResource, permission)
                 .subscribeOn(schedulersFacade.io())
                 .observeOn(schedulersFacade.ui())
@@ -249,7 +281,7 @@ public class AccessControlViewModel implements ViewModel {
         );
     }
 
-    public void deleteACL(int aceId) {
+    public void deleteACL(long aceId) {
         disposable.add(deleteAclUseCase.execute(deviceProperty.get(), aceId)
                 .subscribeOn(schedulersFacade.io())
                 .observeOn(schedulersFacade.ui())

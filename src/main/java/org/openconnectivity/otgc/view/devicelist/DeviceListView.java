@@ -70,6 +70,7 @@ public class DeviceListView implements FxmlView<DeviceListViewModel>, Initializa
         }));
 
         viewModel.scanResponseProperty().addListener(this::processScanResponse);
+        viewModel.updateDeviceResponseProperty().addListener(this::processUpdateDeviceResponse);
     }
 
     private void processScanResponse(ObservableValue<? extends Response<Device>> observableValue, Response<Device> oldValue, Response<Device> newValue) {
@@ -89,6 +90,15 @@ public class DeviceListView implements FxmlView<DeviceListViewModel>, Initializa
             case COMPLETE:
                 notificationCenter.publish(NotificationKey.SET_PROGRESS_STATUS, false);
                 Toast.show(primaryStage, resourceBundle.getString("devicelist.scan.success"));
+                break;
+        }
+    }
+
+    private void processUpdateDeviceResponse(ObservableValue<? extends Response<Device>> observableValue, Response<Device> oldValue, Response<Device> newValue) {
+        switch (newValue.status) {
+            case SUCCESS:
+                listView.getSelectionModel().getSelectedItem().setDeviceType(newValue.data.getDeviceType());
+                listView.refresh();
                 break;
         }
     }

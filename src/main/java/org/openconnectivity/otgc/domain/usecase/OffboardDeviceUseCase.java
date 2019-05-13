@@ -21,7 +21,6 @@ package org.openconnectivity.otgc.domain.usecase;
 
 import io.reactivex.Single;
 import org.openconnectivity.otgc.data.repository.IotivityRepository;
-import org.openconnectivity.otgc.data.repository.SettingRepository;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
 import org.openconnectivity.otgc.data.repository.DoxsRepository;
 
@@ -32,15 +31,12 @@ public class OffboardDeviceUseCase {
 
     private final IotivityRepository iotivityRepository;
     private final DoxsRepository doxsRepository;
-    private final SettingRepository settingRepository;
 
     @Inject
     public OffboardDeviceUseCase(IotivityRepository iotivityRepository,
-                                 DoxsRepository doxsRepository,
-                                 SettingRepository settingRepository) {
+                                 DoxsRepository doxsRepository) {
         this.iotivityRepository = iotivityRepository;
         this.doxsRepository = doxsRepository;
-        this.settingRepository = settingRepository;
     }
 
     public Single<Device> execute(Device deviceToOffboard) {

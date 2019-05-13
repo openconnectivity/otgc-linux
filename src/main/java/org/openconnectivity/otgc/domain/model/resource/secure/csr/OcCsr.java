@@ -19,21 +19,18 @@
 
 package org.openconnectivity.otgc.domain.model.resource.secure.csr;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
+import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class OcCsr {
+public class OcCsr extends OcResourceBase {
 
     private byte[] derCsr;
     private String pemCsr = "";
     private String encoding = "";
-    private List<String> resourceTypes = new ArrayList<>();
-    private List<String> interfaces = new ArrayList<>();
 
     public OcCsr() {
 
@@ -63,37 +60,21 @@ public class OcCsr {
         this.encoding = encoding;
     }
 
-    public List<String> getResourceTypes() {
-        return resourceTypes;
-    }
-
-    public void setResourceTypes(List<String> resourceTypes) {
-        this.resourceTypes = resourceTypes;
-    }
-
-    public List<String> getInterfaces() {
-        return interfaces;
-    }
-
-    public void setInterfaces(List<String> interfaces) {
-        this.interfaces = interfaces;
-    }
-
     public void parseOCRepresentation(OCRepresentation rep) {
         /* csr DER format */
-        byte[] csrDer = OCRepUtil.repGetByteString(rep, OcfResourceAttributeKey.CSR_KEY);
+        byte[] csrDer = OCRep.getByteString(rep, OcfResourceAttributeKey.CSR_KEY);
         this.setDerCsr(csrDer);
         /* csr PEM format */
-        String csrPem = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.CSR_KEY);
+        String csrPem = OCRep.getString(rep, OcfResourceAttributeKey.CSR_KEY);
         this.setPemCsr(csrPem);
         /* encoding */
-        String encoding = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ENCODING_KEY);
+        String encoding = OCRep.getString(rep, OcfResourceAttributeKey.ENCODING_KEY);
         this.setEncoding(encoding);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(Arrays.asList(resourceTypes));
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(Arrays.asList(interfaces));
     }
 }

@@ -20,6 +20,7 @@
 package org.openconnectivity.otgc.data.repository;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.apache.log4j.Logger;
@@ -94,7 +95,7 @@ public class IotivityRepository {
                 LOG.error("Failed to setup Storage Config.");
             }
 
-            OCMain.setIntrospectionFile(0 /* First device */, OtgcConstant.INTROSPECTION_CBOR_FILE);
+            OCIntrospection.setIntrospectionFile(0 /* First device */, OtgcConstant.INTROSPECTION_CBOR_FILE);
 
             int ret = OCMain.mainInit(new OCMainInitHandler() {
                 @Override
@@ -128,14 +129,14 @@ public class IotivityRepository {
 
     public Single<String> getDeviceId() {
         return Single.create(emitter -> {
-            OCSecurityDoxm doxm = OCDoxm.getOwnDoxm(0 /* First registered device */);
-            emitter.onSuccess(OCUuidUtil.uuidToString(doxm.getDeviceuuid()));
+            OCUuid uuid = OCCoreRes.getDeviceId(0 /* First registered device */);
+            emitter.onSuccess(OCUuidUtil.uuidToString(uuid));
         });
     }
 
-    public Completable setFactoryResetHandler(OCSetFactoryPresetsHandler handler) {
+    public Completable setFactoryResetHandler(OCFactoryPresetsHandler handler) {
         return Completable.create(emitter -> {
-            OCMain.setFactoryPresetsCallback(handler);
+            OCMain.setFactoryPresetsHandler(handler);
             emitter.onComplete();
         });
     }
@@ -151,12 +152,12 @@ public class IotivityRepository {
 
                 DeviceEntity device = deviceDao.findById(deviceId);
                 if (device == null) {
-                    deviceDao.insert(new DeviceEntity(deviceId, "", new ArrayList<>()));
+                    deviceDao.insert(new DeviceEntity(deviceId, "", endpoints, DeviceType.UNOWNED, Device.NOTHING_PERMITS));
                 } else {
-                    deviceDao.insert(new DeviceEntity(device.getId(), device.getName(), new ArrayList<>()));
+                    deviceDao.insert(new DeviceEntity(deviceId, device.getName(), endpoints, DeviceType.UNOWNED, Device.NOTHING_PERMITS));
                 }
 
-                unownedDevices.add(new Device(DeviceType.UNOWNED, deviceId, new OcDeviceInfo(), endpoints));
+                unownedDevices.add(new Device(DeviceType.UNOWNED, deviceId, new OcDeviceInfo(), endpoints, Device.NOTHING_PERMITS));
             };
 
             int ret = OCObt.discoverUnownedDevices(handler);
@@ -181,12 +182,12 @@ public class IotivityRepository {
 
                 DeviceEntity device = deviceDao.findById(deviceId);
                 if (device == null) {
-                    deviceDao.insert(new DeviceEntity(deviceId, "", new ArrayList<>()));
+                    deviceDao.insert(new DeviceEntity(deviceId, "", endpoints, DeviceType.OWNED_BY_SELF, Device.FULL_PERMITS));
                 } else {
-                    deviceDao.insert(new DeviceEntity(device.getId(), device.getName(), new ArrayList<>()));
+                    deviceDao.insert(new DeviceEntity(deviceId, device.getName(), endpoints, DeviceType.OWNED_BY_SELF, Device.FULL_PERMITS));
                 }
 
-                ownedDevices.add(new Device(DeviceType.OWNED_BY_SELF, deviceId, new OcDeviceInfo(), endpoints));
+                ownedDevices.add(new Device(DeviceType.OWNED_BY_SELF, deviceId, new OcDeviceInfo(), endpoints, Device.FULL_PERMITS));
             };
 
             int ret = OCObt.discoverOwnedDevices(handler);
@@ -220,11 +221,13 @@ public class IotivityRepository {
 
                     DeviceEntity device = deviceDao.findById(deviceId);
                     if (device == null) {
-                        deviceDao.insert(new DeviceEntity(deviceId, "", endpoints));
+                        deviceDao.insert(new DeviceEntity(deviceId, "", endpoints, DeviceType.OWNED_BY_OTHER, Device.NOTHING_PERMITS));
+                        allDevices.add(new Device(DeviceType.OWNED_BY_OTHER, deviceId, new OcDeviceInfo(), endpoints, Device.NOTHING_PERMITS));
                     } else {
-                        deviceDao.insert(new DeviceEntity(deviceId, device.getName(), endpoints));
+                        deviceDao.insert(new DeviceEntity(deviceId, device.getName(), endpoints, device.getType(), device.getPermits()));
+                        allDevices.add(new Device(device.getType(), deviceId, new OcDeviceInfo(), endpoints, device.getPermits()));
                     }
-                    allDevices.add(new Device(DeviceType.OWNED_BY_OTHER, deviceId, new OcDeviceInfo(), endpoints));
+
                 }
             };
 
@@ -379,6 +382,17 @@ public class IotivityRepository {
         });
     }
 
+    public Completable updateDeviceType(String deviceId, DeviceType type, int permits) {
+        return Completable.fromAction(() -> deviceDao.updateDeviceType(deviceId, type, permits));
+    }
+
+    public Single<DeviceEntity> getDeviceFromDatabase(String deviceId) {
+        return Single.create(emitter -> {
+            DeviceEntity device = deviceDao.findById(deviceId);
+            emitter.onSuccess(device);
+        });
+    }
+
     public int getDiscoveryTimeout() {
         return Integer.parseInt(settingRepository.get(SettingRepository.DISCOVERY_TIMEOUT_KEY,
                                                         SettingRepository.DISCOVERY_TIMEOUT_DEFAULT_VALUE));
@@ -498,9 +512,9 @@ public class IotivityRepository {
             };
 
             if (OCMain.initPost(uri, ep, null, handler, OCQos.HIGH_QOS)) {
-                CborEncoder root = OCRepUtil.repBeginRootObject();
+                CborEncoder root = OCRep.beginRootObject();
                 parseOCRepresentionToCbor(root, rep, valueArray);
-                OCRepUtil.repEndRootObject();
+                OCRep.endRootObject();
 
                 if (!OCMain.doPost()) {
                     emitter.onError(new Exception("Do POST " + uri + " error"));
@@ -517,25 +531,25 @@ public class IotivityRepository {
         while (rep != null) {
             switch (rep.getType()) {
                 case OC_REP_BOOL:
-                    OCRepUtil.repSetBoolean(parent, rep.getName(), rep.getValue().getBool());
+                    OCRep.setBoolean(parent, rep.getName(), rep.getValue().getBool());
                     break;
                 case OC_REP_INT:
-                    OCRepUtil.repSetInt(parent, rep.getName(), (int)rep.getValue().getInteger());
+                    OCRep.setLong(parent, rep.getName(), rep.getValue().getInteger());
                     break;
                 case OC_REP_DOUBLE:
-                    OCRepUtil.repSetDouble(parent, rep.getName(), rep.getValue().getDouble());
+                    OCRep.setDouble(parent, rep.getName(), rep.getValue().getDouble());
                     break;
                 case OC_REP_STRING:
-                    OCRepUtil.repSetTextString(parent, rep.getName(), rep.getValue().getString());
+                    OCRep.setTextString(parent, rep.getName(), rep.getValue().getString());
                     break;
                 case OC_REP_INT_ARRAY:
-                    OCRepUtil.repSetIntArray(parent, rep.getName(), (int[])valueArray);
+                    OCRep.setLongArray(parent, rep.getName(), (long[])valueArray);
                     break;
                 case OC_REP_DOUBLE_ARRAY:
-                    OCRepUtil.repSetDoubleArray(parent, rep.getName(), (double[])valueArray);
+                    OCRep.setDoubleArray(parent, rep.getName(), (double[])valueArray);
                     break;
                 case OC_REP_STRING_ARRAY:
-                    OCRepUtil.repSetStringArray(parent, rep.getName(), (String[])valueArray);
+                    OCRep.setStringArray(parent, rep.getName(), (String[])valueArray);
                     break;
                 default:
                     break;

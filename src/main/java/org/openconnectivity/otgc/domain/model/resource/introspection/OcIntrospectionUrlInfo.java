@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.model.resource.introspection;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
@@ -29,7 +29,7 @@ public class OcIntrospectionUrlInfo {
     private String uri;
     private String protocol;
     private String contentType;
-    private Integer version;
+    private Long version;
 
     public OcIntrospectionUrlInfo() {
     }
@@ -66,11 +66,11 @@ public class OcIntrospectionUrlInfo {
         this.contentType = contentType;
     }
 
-    public Integer getVersion() {
+    public Long getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 
@@ -86,16 +86,16 @@ public class OcIntrospectionUrlInfo {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* url */
-        String url = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.URL_KEY);
+        String url = OCRep.getString(rep, OcfResourceAttributeKey.URL_KEY);
         this.separateUrlInHostAndUri(url);
         /* protocol */
-        String protocol = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.PROTOCOL_KEY);
+        String protocol = OCRep.getString(rep, OcfResourceAttributeKey.PROTOCOL_KEY);
         this.setProtocol(protocol);
         /* content-type */
-        String contentType = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.CONTENT_TYPE_KEY);
+        String contentType = OCRep.getString(rep, OcfResourceAttributeKey.CONTENT_TYPE_KEY);
         this.setContentType(contentType);
         /* version */
-        Integer version = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.VERSION_KEY);
+        Long version = OCRep.getLong(rep, OcfResourceAttributeKey.VERSION_KEY);
         this.setVersion(version);
     }
 }

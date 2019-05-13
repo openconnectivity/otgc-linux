@@ -20,7 +20,7 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.acl;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
@@ -74,47 +74,47 @@ public class OcAceResource {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* href */
-        String href = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.HREF_KEY);
+        String href = OCRep.getString(rep, OcfResourceAttributeKey.HREF_KEY);
         this.setHref(href);
         /* wc */
-        String wc = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.WILDCARD_KEY);
+        String wc = OCRep.getString(rep, OcfResourceAttributeKey.WILDCARD_KEY);
         this.setWildCard(wc);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(resourceTypes != null ? Arrays.asList(resourceTypes) : null);
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(interfaces != null ? Arrays.asList(interfaces) : null);
     }
 
     public void parseToCbor(CborEncoder resArray) {
-        CborEncoder resObj = OCRepUtil.repBeginObject(resArray);
+        CborEncoder resObj = OCRep.beginObject(resArray);
 
         /* href */
         if (this.getHref() != null && !this.getHref().isEmpty()) {
-            OCRepUtil.repSetTextString(resObj, OcfResourceAttributeKey.HREF_KEY, this.getHref());
+            OCRep.setTextString(resObj, OcfResourceAttributeKey.HREF_KEY, this.getHref());
         }
         /* wc */
         if (this.getWildcard() != null && !this.getWildcard().isEmpty()) {
-            OCRepUtil.repSetTextString(resObj, OcfResourceAttributeKey.WILDCARD_KEY, this.getWildcard());
+            OCRep.setTextString(resObj, OcfResourceAttributeKey.WILDCARD_KEY, this.getWildcard());
         }
         /* rt */
         if (this.getResourceTypes() != null && !this.getResourceTypes().isEmpty()) {
-            CborEncoder resourceType = OCRepUtil.repOpenArray(resObj, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+            CborEncoder resourceType = OCRep.openArray(resObj, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
             for (String rtStr : this.getResourceTypes()) {
-                OCRepUtil.repAddTextString(resourceType, rtStr);
+                OCRep.addTextString(resourceType, rtStr);
             }
-            OCRepUtil.repCloseArray(resObj, resourceType);
+            OCRep.closeArray(resObj, resourceType);
         }
         /* if */
         if (this.getInterfaces() != null && !this.getInterfaces().isEmpty()) {
-            CborEncoder interfaces = OCRepUtil.repOpenArray(resObj, OcfResourceAttributeKey.INTERFACES_KEY);
+            CborEncoder interfaces = OCRep.openArray(resObj, OcfResourceAttributeKey.INTERFACES_KEY);
             for (String ifStr : this.getInterfaces()) {
-                OCRepUtil.repAddTextString(interfaces, ifStr);
+                OCRep.addTextString(interfaces, ifStr);
             }
-            OCRepUtil.repCloseArray(resObj, interfaces);
+            OCRep.closeArray(resObj, interfaces);
         }
 
-        OCRepUtil.repCloseObject(resArray, resObj);
+        OCRep.closeObject(resArray, resObj);
     }
 }

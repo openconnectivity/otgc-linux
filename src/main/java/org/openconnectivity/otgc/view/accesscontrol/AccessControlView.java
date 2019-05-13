@@ -192,7 +192,7 @@ public class AccessControlView implements FxmlView<AccessControlViewModel>, Init
         viewModel.deleteACL(amsListView.getSelectionModel().getSelectedItem().getAceid());
     }
 
-    private void processDeleteAclResponse(ObservableValue<? extends Response<Integer>> observableValue, Response<Integer> oldValue, Response<Integer> newValue) {
+    private void processDeleteAclResponse(ObservableValue<? extends Response<Long>> observableValue, Response<Long> oldValue, Response<Long> newValue) {
         switch (newValue.status) {
             case LOADING:
                 notificationCenter.publish(NotificationKey.SET_PROGRESS_STATUS, true);

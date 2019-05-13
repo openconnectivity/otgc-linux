@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.model.resource.virtual.res;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
@@ -41,7 +41,7 @@ public class OcEndpoint {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* ep */
-        String ep = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ENDPOINT_KEY);
+        String ep = OCRep.getString(rep, OcfResourceAttributeKey.ENDPOINT_KEY);
         this.setEndpoint(ep);
     }
 }

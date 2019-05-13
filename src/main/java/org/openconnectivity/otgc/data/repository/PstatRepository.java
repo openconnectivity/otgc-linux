@@ -22,12 +22,15 @@ package org.openconnectivity.otgc.data.repository;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import org.iotivity.*;
+import org.openconnectivity.otgc.utils.constant.OcfDosType;
 import org.openconnectivity.otgc.utils.constant.OcfResourceUri;
 import org.openconnectivity.otgc.domain.model.resource.secure.pstat.OcPstatDeviceState;
 import org.openconnectivity.otgc.domain.model.resource.secure.pstat.OcPstat;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class PstatRepository {
 
     @Inject
@@ -35,7 +38,7 @@ public class PstatRepository {
 
     }
 
-    public Completable changeDeviceStatus(String endpoint, OCDosType dosType) {
+    public Completable changeDeviceStatus(String endpoint, OcfDosType dosType) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
@@ -54,7 +57,7 @@ public class PstatRepository {
             if (OCMain.initPost(OcfResourceUri.PSTAT_URI, ep, null, handler, OCQos.HIGH_QOS)) {
                 // Create pstat resource
                 OcPstatDeviceState dos = new OcPstatDeviceState();
-                dos.setDeviceOnboardingState(dosType.swigValue());
+                dos.setDeviceOnboardingState((long)dosType.getValue());
                 OcPstat pstat = new OcPstat();
                 pstat.setDeviceState(dos);
 

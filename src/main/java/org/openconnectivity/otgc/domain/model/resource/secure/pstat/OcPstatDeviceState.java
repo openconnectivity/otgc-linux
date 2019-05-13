@@ -20,24 +20,24 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.pstat;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
 public class OcPstatDeviceState {
 
-    private Integer deviceOnboardingState;
+    private Long deviceOnboardingState;
     private Boolean pendingState;
 
     public OcPstatDeviceState() {
 
     }
 
-    public Integer getDeviceOnboardingState() {
+    public Long getDeviceOnboardingState() {
         return deviceOnboardingState;
     }
 
-    public void setDeviceOnboardingState(Integer deviceOnboardingState) {
+    public void setDeviceOnboardingState(Long deviceOnboardingState) {
         this.deviceOnboardingState = deviceOnboardingState;
     }
 
@@ -51,21 +51,21 @@ public class OcPstatDeviceState {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* s */
-        int s = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.DEVICE_ONBOARDING_STATE_KEY);
-        this.setDeviceOnboardingState(Integer.valueOf(s));
+        Long s = OCRep.getLong(rep, OcfResourceAttributeKey.DEVICE_ONBOARDING_STATE_KEY);
+        this.setDeviceOnboardingState(s);
         /* p */
-        boolean p = OCRepUtil.repGetBoolean(rep, OcfResourceAttributeKey.PENDING_STATE_KEY);
+        boolean p = OCRep.getBoolean(rep, OcfResourceAttributeKey.PENDING_STATE_KEY);
         this.setPendingState(Boolean.valueOf(p));
     }
 
     public void parseToCbor(CborEncoder parent) {
         /* s */
         if (this.getDeviceOnboardingState() != null) {
-            OCRepUtil.repSetInt(parent, OcfResourceAttributeKey.DEVICE_ONBOARDING_STATE_KEY, this.getDeviceOnboardingState());
+            OCRep.setLong(parent, OcfResourceAttributeKey.DEVICE_ONBOARDING_STATE_KEY, this.getDeviceOnboardingState());
         }
         /* p */
         if (this.isPendingState() != null) {
-            OCRepUtil.repSetBoolean(parent, OcfResourceAttributeKey.PENDING_STATE_KEY, this.isPendingState());
+            OCRep.setBoolean(parent, OcfResourceAttributeKey.PENDING_STATE_KEY, this.isPendingState());
         }
     }
 }

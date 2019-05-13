@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.model.resource.virtual.res;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
@@ -73,17 +73,17 @@ public class OcResource extends OcResourceBase {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* anchor */
-        String anchor = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ANCHOR_KEY);
+        String anchor = OCRep.getString(rep, OcfResourceAttributeKey.ANCHOR_KEY);
         this.setAnchor(anchor);
         /* href */
-        String href = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.HREF_RES_KEY);
+        String href = OCRep.getString(rep, OcfResourceAttributeKey.HREF_RES_KEY);
         this.setHref(href);
         /* p.bm */
-        OCRepresentation pObj = OCRepUtil.repGetObject(rep, OcfResourceAttributeKey.PROPERTIES_KEY);
-        Integer bm = OCRepUtil.repGetInt(pObj, OcfResourceAttributeKey.FRAMEWORK_POLICIES_KEY);
+        OCRepresentation pObj = OCRep.getObject(rep, OcfResourceAttributeKey.PROPERTIES_KEY);
+        Integer bm = OCRep.getLong(pObj, OcfResourceAttributeKey.FRAMEWORK_POLICIES_KEY).intValue();
         this.setPropertiesMask(bm);
         /* eps */
-        OCRepresentation epsObjArray = OCRepUtil.repGetObjectArray(rep, OcfResourceAttributeKey.ENDPOINTS_KEY);
+        OCRepresentation epsObjArray = OCRep.getObjectArray(rep, OcfResourceAttributeKey.ENDPOINTS_KEY);
         List<OcEndpoint> endpointList = new ArrayList<>();
         while (epsObjArray != null) {
             OcEndpoint endpoint = new OcEndpoint();
@@ -95,10 +95,10 @@ public class OcResource extends OcResourceBase {
         this.setEndpoints(endpointList);
 
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(resourceTypes != null ? Arrays.asList(resourceTypes): null);
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(interfaces != null ? Arrays.asList(interfaces) : null);
     }
 }

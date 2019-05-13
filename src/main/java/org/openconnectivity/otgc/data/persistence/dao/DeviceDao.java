@@ -21,6 +21,7 @@ package org.openconnectivity.otgc.data.persistence.dao;
 
 import org.openconnectivity.otgc.data.entity.DeviceEntity;
 import org.openconnectivity.otgc.data.persistence.DatabaseManager;
+import org.openconnectivity.otgc.domain.model.devicelist.DeviceType;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -33,6 +34,7 @@ public class DeviceDao implements Dao {
     private static final String FIND_ALL_DEVICES = "Device.findAll";
     private static final String FIND_DEVICE_BY_ID = "Device.findById";
     private static final String UPDATE_DEVICE_NAME = "Device.updateName";
+    private static final String UPDATE_DEVICE_TYPE = "Device.updateType";
 
     @Inject
     public DeviceDao() {
@@ -83,6 +85,19 @@ public class DeviceDao implements Dao {
         parameters.put("name", deviceName);
         parameters.put("id", deviceId);
         Query q = DatabaseManager.updateWithNamedQuery(UPDATE_DEVICE_NAME, parameters);
+    }
+
+    /**
+     * Update the device type
+     * @param deviceId Device ID to update
+     * @param deviceType Device name value
+     */
+    public void updateDeviceType(String deviceId, DeviceType deviceType, int permits) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("type", deviceType);
+        parameters.put("permits", permits);
+        parameters.put("id", deviceId);
+        Query q = DatabaseManager.updateWithNamedQuery(UPDATE_DEVICE_TYPE, parameters);
     }
 
     /**

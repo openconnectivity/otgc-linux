@@ -19,8 +19,8 @@
 
 package org.openconnectivity.otgc.domain.usecase;
 
-import org.iotivity.OCSetRandomPinHandler;
 import org.openconnectivity.otgc.data.repository.DoxsRepository;
+import org.openconnectivity.otgc.utils.handler.OCSetRandomPinHandler;
 
 import javax.inject.Inject;
 

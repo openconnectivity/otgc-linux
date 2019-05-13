@@ -99,7 +99,7 @@ public class AmsRepository {
         });
     }
 
-    public Completable provisionUuidAcl(String endpoint, String subjectId, List<String> verticalResources, int permission) {
+    public Completable provisionUuidAcl(String endpoint, String subjectId, List<String> verticalResources, long permission) {
         OcAceSubject subject = new OcAceSubject();
         subject.setType(OcAceSubjectType.UUID_TYPE);
         subject.setUuid(subjectId);
@@ -115,7 +115,7 @@ public class AmsRepository {
         return provisionAcl(endpoint, acl);
     }
 
-    public Completable provisionRoleAcl(String endpoint, String roleId, String roleAuthority, List<String> verticalResources, int permission) {
+    public Completable provisionRoleAcl(String endpoint, String roleId, String roleAuthority, List<String> verticalResources, long permission) {
         OcAceSubject subject = new OcAceSubject();
         subject.setType(OcAceSubjectType.ROLE_TYPE);
         subject.setRoleId(roleId);
@@ -132,7 +132,7 @@ public class AmsRepository {
         return provisionAcl(endpoint, acl);
     }
 
-    public Completable provisionConntypeAcl(String endpoint, boolean isAuthCrypt, List<String> verticalResources, int permission) {
+    public Completable provisionConntypeAcl(String endpoint, boolean isAuthCrypt, List<String> verticalResources, long permission) {
         OcAceSubject subject = new OcAceSubject();
         subject.setType(OcAceSubjectType.CONN_TYPE);
         subject.setConnType(isAuthCrypt ? "auth-crypt" : "anon-clear");
@@ -148,7 +148,7 @@ public class AmsRepository {
         return provisionAcl(endpoint, acl);
     }
 
-    public Completable deleteAcl(String endpoint, int aceId) {
+    public Completable deleteAcl(String endpoint, long aceId) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);

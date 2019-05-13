@@ -36,26 +36,15 @@ public class ProvisionRepository {
 
     public Completable resetSvrDb() {
         return Completable.create(emitter -> {
-            OCSecurityPstat pstat = OCPstat.getOwnPstat(0 /* First device */);
-            if (pstat.getS() == OCDosType.OC_DOS_RFNOP) {
-                // Reset device
-                OCPstat.reset();
-                emitter.onComplete();
-            } else {
-                emitter.onError(new Exception("Change to RFOTM error"));
-            }
+            OCMain.reset();
+            emitter.onComplete();
         });
     }
 
     public Completable doSelfOwnership() {
         return Completable.create(emitter -> {
-            OCSecurityPstat pstat = OCPstat.getOwnPstat(0 /* First registered device */);
-            if (pstat.getS() == OCDosType.OC_DOS_RFOTM) {
-                OCObt.init();
-                emitter.onComplete();
-            } else {
-                emitter.onError(new Exception("Change to RFNOP error"));
-            }
+            OCObt.init();
+            emitter.onComplete();
         });
     }
 }

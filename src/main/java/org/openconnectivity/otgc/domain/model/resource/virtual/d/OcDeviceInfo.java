@@ -19,7 +19,7 @@
 
 package org.openconnectivity.otgc.domain.model.resource.virtual.d;
 
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.domain.model.resource.OcResourceBase;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
@@ -126,41 +126,41 @@ public class OcDeviceInfo extends OcResourceBase {
 
     public void parseOCRepresentation(OCRepresentation rep) {
        /* di */
-        String di = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DEVICE_ID_KEY);
+        String di = OCRep.getString(rep, OcfResourceAttributeKey.DEVICE_ID_KEY);
         this.setDeviceId(di);
         /* piid */
-        String piid = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.PIID_KEY);
+        String piid = OCRep.getString(rep, OcfResourceAttributeKey.PIID_KEY);
         this.setPiid(piid);
         /* icv */
-        String icv = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.SPEC_VERSION_URL_KEY);
+        String icv = OCRep.getString(rep, OcfResourceAttributeKey.SPEC_VERSION_URL_KEY);
         this.setSpecVersionUrl(icv);
         /* dmv */
-        String dmv = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DATA_MODEL_KEY);
+        String dmv = OCRep.getString(rep, OcfResourceAttributeKey.DATA_MODEL_KEY);
         this.setDataModel(dmv);
         /* sv */
-        String sv = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.SW_VERSION_KEY);
+        String sv = OCRep.getString(rep, OcfResourceAttributeKey.SW_VERSION_KEY);
         this.setSoftwareVersion(sv);
         /* dmn */
-        String dmn = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DEV_MAN_NAME_KEY);
+        String dmn = OCRep.getString(rep, OcfResourceAttributeKey.DEV_MAN_NAME_KEY);
         this.setManufacturerName(dmn);
         /* dmno */
-        String dmno = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.DEV_MODEL_NO_KEY);
+        String dmno = OCRep.getString(rep, OcfResourceAttributeKey.DEV_MODEL_NO_KEY);
         this.setModelNumber(dmno);
         /* ld */
-        String[] ld = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.DESCRIPTIONS_KEY);
+        String[] ld = OCRep.getStringArray(rep, OcfResourceAttributeKey.DESCRIPTIONS_KEY);
         this.setLocalizedDescriptions(ld != null ? Arrays.asList(ld) : null);
 
         /* id */
-        String id = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.ID_KEY);
+        String id = OCRep.getString(rep, OcfResourceAttributeKey.ID_KEY);
         this.setId(id);
         /* n */
-        String name = OCRepUtil.repGetString(rep, OcfResourceAttributeKey.NAME_KEY);
+        String name = OCRep.getString(rep, OcfResourceAttributeKey.NAME_KEY);
         this.setName(name);
         /* rt */
-        String[] resourceTypes = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
+        String[] resourceTypes = OCRep.getStringArray(rep, OcfResourceAttributeKey.RESOURCE_TYPES_KEY);
         this.setResourceTypes(resourceTypes != null ? Arrays.asList(resourceTypes) : null);
         /* if */
-        String[] interfaces = OCRepUtil.repGetStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
+        String[] interfaces = OCRep.getStringArray(rep, OcfResourceAttributeKey.INTERFACES_KEY);
         this.setInterfaces(interfaces != null ? Arrays.asList(interfaces) : null);
     }
 

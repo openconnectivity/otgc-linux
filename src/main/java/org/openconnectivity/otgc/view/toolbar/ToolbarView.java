@@ -31,9 +31,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
-import org.iotivity.OCOxmType;
 import org.openconnectivity.otgc.utils.constant.NotificationKey;
 import org.openconnectivity.otgc.domain.model.devicelist.Device;
+import org.openconnectivity.otgc.utils.constant.OcfOxmType;
 import org.openconnectivity.otgc.utils.util.Toast;
 import org.openconnectivity.otgc.utils.viewmodel.Response;
 import org.openconnectivity.otgc.viewmodel.ToolbarViewModel;
@@ -64,7 +64,7 @@ public class ToolbarView implements FxmlView<ToolbarViewModel>, Initializable {
 
     private int positionBeingUpdated = 0;
 
-    private OCOxmType selectedOxm;
+    private OcfOxmType selectedOxm;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -81,16 +81,16 @@ public class ToolbarView implements FxmlView<ToolbarViewModel>, Initializable {
         viewModel.rfnopResponseProperty().addListener(this::processRfnopResponse);
     }
 
-    public OCOxmType onGetOxM(List<OCOxmType> supportedOxm) {
+    public OcfOxmType onGetOxM(List<OcfOxmType> supportedOxm) {
         selectedOxm = null;
         List<CharSequence> options = new ArrayList<>();
-        if (supportedOxm.contains(OCOxmType.OC_OXMTYPE_JW)) {
+        if (supportedOxm.contains(OcfOxmType.OC_OXMTYPE_JW)) {
             options.add(resourceBundle.getString("oxm.just_works"));
         }
-        if (supportedOxm.contains(OCOxmType.OC_OXMTYPE_RDP)) {
+        if (supportedOxm.contains(OcfOxmType.OC_OXMTYPE_RDP)) {
             options.add(resourceBundle.getString("oxm.random_pin"));
         }
-        if (supportedOxm.contains(OCOxmType.OC_OXMTYPE_MFG_CERT)) {
+        if (supportedOxm.contains(OcfOxmType.OC_OXMTYPE_MFG_CERT)) {
             options.add(resourceBundle.getString("oxm.manufacturer_certificate"));
         }
 
@@ -106,11 +106,11 @@ public class ToolbarView implements FxmlView<ToolbarViewModel>, Initializable {
                     synchronized (lock) {
                         String strSelect = result.get();
                         if (strSelect.equals(resourceBundle.getString("oxm.just_works"))) {
-                            selectedOxm = OCOxmType.OC_OXMTYPE_JW;
+                            selectedOxm = OcfOxmType.OC_OXMTYPE_JW;
                         } else if (strSelect.equals(resourceBundle.getString("oxm.random_pin"))) {
-                            selectedOxm = OCOxmType.OC_OXMTYPE_RDP;
+                            selectedOxm = OcfOxmType.OC_OXMTYPE_RDP;
                         } else if (strSelect.equals(resourceBundle.getString("oxm.manufacturer_certificate"))) {
-                            selectedOxm = OCOxmType.OC_OXMTYPE_MFG_CERT;
+                            selectedOxm = OcfOxmType.OC_OXMTYPE_MFG_CERT;
                         }
                         lock.notifyAll();
                     }

@@ -20,7 +20,7 @@
 package org.openconnectivity.otgc.domain.model.resource.secure.acl;
 
 import org.iotivity.CborEncoder;
-import org.iotivity.OCRepUtil;
+import org.iotivity.OCRep;
 import org.iotivity.OCRepresentation;
 import org.openconnectivity.otgc.utils.constant.OcfResourceAttributeKey;
 
@@ -29,8 +29,8 @@ import java.util.List;
 
 public class OcAce {
 
-    private Integer aceid;
-    private Integer permission;
+    private Long aceid;
+    private Long permission;
     private OcAceSubject subject;
     private List<OcAceResource> resources;
 
@@ -38,19 +38,19 @@ public class OcAce {
         this.resources = new ArrayList<>();
     }
 
-    public Integer getAceid() {
+    public Long getAceid() {
         return aceid;
     }
 
-    public void setAceid(Integer aceid) {
+    public void setAceid(Long aceid) {
         this.aceid = aceid;
     }
 
-    public Integer getPermission() {
+    public Long getPermission() {
         return permission;
     }
 
-    public void setPermission(Integer permission) {
+    public void setPermission(Long permission) {
         this.permission = permission;
     }
 
@@ -72,18 +72,18 @@ public class OcAce {
 
     public void parseOCRepresentation(OCRepresentation rep) {
         /* aceid */
-        int aceid = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.ACE_ID_KEY);
+        Long aceid = OCRep.getLong(rep, OcfResourceAttributeKey.ACE_ID_KEY);
         this.setAceid(aceid);
         /* permission */
-        int permission = OCRepUtil.repGetInt(rep, OcfResourceAttributeKey.PERMISSION_KEY);
+        Long permission = OCRep.getLong(rep, OcfResourceAttributeKey.PERMISSION_KEY);
         this.setPermission(permission);
         /* subject */
-        OCRepresentation subjectObj = OCRepUtil.repGetObject(rep, OcfResourceAttributeKey.SUBJECT_KEY);
+        OCRepresentation subjectObj = OCRep.getObject(rep, OcfResourceAttributeKey.SUBJECT_KEY);
         OcAceSubject subject = new OcAceSubject();
         subject.parseOCRepresentation(subjectObj);
         this.setSubject(subject);
         /* resources */
-        OCRepresentation resourcesObj = OCRepUtil.repGetObjectArray(rep, OcfResourceAttributeKey.RESOURCES_KEY);
+        OCRepresentation resourcesObj = OCRep.getObjectArray(rep, OcfResourceAttributeKey.RESOURCES_KEY);
         List<OcAceResource> resources = new ArrayList<>();
         while (resourcesObj != null) {
             OcAceResource resource = new OcAceResource();
@@ -95,31 +95,31 @@ public class OcAce {
     }
 
     public void parseToCbor(CborEncoder aclist2) {
-        CborEncoder aceObj = OCRepUtil.repBeginObject(aclist2);
+        CborEncoder aceObj = OCRep.beginObject(aclist2);
 
         /* aceid */
         if (this.getAceid() !=  null) {
-            OCRepUtil.repSetInt(aceObj, OcfResourceAttributeKey.ACE_ID_KEY, this.getAceid());
+            OCRep.setLong(aceObj, OcfResourceAttributeKey.ACE_ID_KEY, this.getAceid());
         }
         /* subject */
         if (this.getSubject() != null) {
-            CborEncoder subjectObj = OCRepUtil.repOpenObject(aceObj, OcfResourceAttributeKey.SUBJECT_KEY);
+            CborEncoder subjectObj = OCRep.openObject(aceObj, OcfResourceAttributeKey.SUBJECT_KEY);
             this.getSubject().parseToCbor(subjectObj);
-            OCRepUtil.repCloseObject(aceObj, subjectObj);
+            OCRep.closeObject(aceObj, subjectObj);
         }
         /* resources */
         if (this.getResources() != null) {
-            CborEncoder resArray = OCRepUtil.repOpenArray(aceObj, OcfResourceAttributeKey.RESOURCES_KEY);
+            CborEncoder resArray = OCRep.openArray(aceObj, OcfResourceAttributeKey.RESOURCES_KEY);
             for (OcAceResource res : this.getResources()) {
                 res.parseToCbor(resArray);
             }
-            OCRepUtil.repCloseArray(aceObj, resArray);
+            OCRep.closeArray(aceObj, resArray);
         }
         /* permission */
         if (this.getPermission() != 0) {
-            OCRepUtil.repSetInt(aceObj, OcfResourceAttributeKey.PERMISSION_KEY, this.getPermission());
+            OCRep.setLong(aceObj, OcfResourceAttributeKey.PERMISSION_KEY, this.getPermission());
         }
 
-        OCRepUtil.repCloseObject(aclist2, aceObj);
+        OCRep.closeObject(aclist2, aceObj);
     }
 }

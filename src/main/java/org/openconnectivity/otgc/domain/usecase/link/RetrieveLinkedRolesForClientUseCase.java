@@ -44,7 +44,7 @@ public class RetrieveLinkedRolesForClientUseCase {
     public Single<List<String>> execute(Device device)
     {
         return iotivityRepository.getSecureEndpoint(device)
-                .flatMap(cmsRepository::getCredentials)
+                .flatMap(endpoint -> cmsRepository.getCredentials(endpoint, device.getDeviceId()))
                 .map(credentials -> {
                     List<String> roles = new ArrayList<>();
 

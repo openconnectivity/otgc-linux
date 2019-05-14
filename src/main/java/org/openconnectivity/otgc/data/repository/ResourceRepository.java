@@ -43,10 +43,12 @@ public class ResourceRepository {
     public ResourceRepository() {
     }
 
-    public Observable<SerializableResource> observeResource(String endpoint, SerializableResource resource) {
+    public Observable<SerializableResource> observeResource(String endpoint, String deviceId, SerializableResource resource) {
         return Observable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();

@@ -56,8 +56,8 @@ public class LinkRoleForClientUseCase {
     public Completable execute(Device device, String roleId, String roleAuthority) {
         return iotivityRepository.getSecureEndpoint(device)
                 .flatMapCompletable(endpoint ->
-                        pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
-                                .andThen(cmsRepository.retrieveCsr(endpoint))
+                        pstatRepository.changeDeviceStatus(endpoint, device.getDeviceId(), OcfDosType.OC_DOSTYPE_RFPRO)
+                                .andThen(cmsRepository.retrieveCsr(endpoint, device.getDeviceId()))
                                 .flatMapCompletable(csr -> {
                                     // Convert CSR
                                     PKCS10CertificationRequest certRequest = certRepository.getPKCS10CertRequest(csr).blockingGet();
@@ -74,6 +74,6 @@ public class LinkRoleForClientUseCase {
 
                                     return cmsRepository.provisionRoleCertificate(endpoint, device.getDeviceId(), roleCert, roleId, roleAuthority);
                                 })
-                                .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP)));
+                                .andThen(pstatRepository.changeDeviceStatus(endpoint, device.getDeviceId(), OcfDosType.OC_DOSTYPE_RFNOP)));
     }
 }

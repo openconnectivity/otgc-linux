@@ -64,8 +64,8 @@ public class LinkRoleForServerUseCase {
                                     return resources;
                                 })
                                 .flatMapCompletable(resources ->
-                                        pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFPRO)
-                                        .andThen(amsRepository.provisionRoleAcl(endpoint, roleId, roleAuthority, resources, 31))
-                                        .andThen(pstatRepository.changeDeviceStatus(endpoint, OcfDosType.OC_DOSTYPE_RFNOP))));
+                                        pstatRepository.changeDeviceStatus(endpoint, device.getDeviceId(), OcfDosType.OC_DOSTYPE_RFPRO)
+                                        .andThen(amsRepository.provisionRoleAcl(endpoint, device.getDeviceId(), roleId, roleAuthority, resources, 31))
+                                        .andThen(pstatRepository.changeDeviceStatus(endpoint, device.getDeviceId(), OcfDosType.OC_DOSTYPE_RFNOP))));
     }
 }

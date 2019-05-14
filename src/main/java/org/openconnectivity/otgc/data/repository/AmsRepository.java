@@ -40,10 +40,12 @@ public class AmsRepository {
     @Inject
     public AmsRepository(){}
 
-    public Single<OcAcl> getAcl(String endpoint) {
+    public Single<OcAcl> getAcl(String endpoint, String deviceId) {
         return  Single.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 if (response.getCode().equals(OCStatus.OC_STATUS_OK)) {
@@ -64,10 +66,12 @@ public class AmsRepository {
         });
     }
 
-    private Completable provisionAcl(String endpoint, OcAcl acl) {
+    private Completable provisionAcl(String endpoint, String deviceId, OcAcl acl) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();
@@ -99,7 +103,7 @@ public class AmsRepository {
         });
     }
 
-    public Completable provisionUuidAcl(String endpoint, String subjectId, List<String> verticalResources, long permission) {
+    public Completable provisionUuidAcl(String endpoint, String deviceId, String subjectId, List<String> verticalResources, long permission) {
         OcAceSubject subject = new OcAceSubject();
         subject.setType(OcAceSubjectType.UUID_TYPE);
         subject.setUuid(subjectId);
@@ -112,10 +116,10 @@ public class AmsRepository {
 
         OcAcl acl = new OcAcl();
         acl.setAceList(aceList);
-        return provisionAcl(endpoint, acl);
+        return provisionAcl(endpoint, deviceId, acl);
     }
 
-    public Completable provisionRoleAcl(String endpoint, String roleId, String roleAuthority, List<String> verticalResources, long permission) {
+    public Completable provisionRoleAcl(String endpoint, String deviceId, String roleId, String roleAuthority, List<String> verticalResources, long permission) {
         OcAceSubject subject = new OcAceSubject();
         subject.setType(OcAceSubjectType.ROLE_TYPE);
         subject.setRoleId(roleId);
@@ -129,10 +133,10 @@ public class AmsRepository {
 
         OcAcl acl = new OcAcl();
         acl.setAceList(aceList);
-        return provisionAcl(endpoint, acl);
+        return provisionAcl(endpoint, deviceId, acl);
     }
 
-    public Completable provisionConntypeAcl(String endpoint, boolean isAuthCrypt, List<String> verticalResources, long permission) {
+    public Completable provisionConntypeAcl(String endpoint, String deviceId, boolean isAuthCrypt, List<String> verticalResources, long permission) {
         OcAceSubject subject = new OcAceSubject();
         subject.setType(OcAceSubjectType.CONN_TYPE);
         subject.setConnType(isAuthCrypt ? "auth-crypt" : "anon-clear");
@@ -145,13 +149,15 @@ public class AmsRepository {
 
         OcAcl acl = new OcAcl();
         acl.setAceList(aceList);
-        return provisionAcl(endpoint, acl);
+        return provisionAcl(endpoint, deviceId, acl);
     }
 
-    public Completable deleteAcl(String endpoint, long aceId) {
+    public Completable deleteAcl(String endpoint, String deviceId, long aceId) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();

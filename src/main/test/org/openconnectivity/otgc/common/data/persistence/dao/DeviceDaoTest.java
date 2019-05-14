@@ -39,7 +39,7 @@ public class DeviceDaoTest {
 
     private static final String DEVICE_ID = "12345678-1234-1234-1234-123456789012";
 
-    @Before
+    /*@Before
     public void setup() {
 
         deviceDao = new DeviceDao();
@@ -91,5 +91,5 @@ public class DeviceDaoTest {
         DeviceEntity entity = deviceDao.findById(DEVICE_ID);
 
         assertThat(entity, is(nullValue()));
-    }
+    }*/
 }

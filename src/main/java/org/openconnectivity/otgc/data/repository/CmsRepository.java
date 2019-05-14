@@ -30,12 +30,9 @@ import org.openconnectivity.otgc.utils.constant.OcfCredUsage;
 import org.openconnectivity.otgc.utils.constant.OcfEncoding;
 import org.openconnectivity.otgc.utils.constant.OcfResourceUri;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,10 +43,12 @@ public class CmsRepository {
     @Inject
     public CmsRepository() {}
 
-    public Single<OcCredentials> getCredentials(String endpoint) {
+    public Single<OcCredentials> getCredentials(String endpoint, String deviceId) {
         return Single.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();
@@ -72,10 +71,12 @@ public class CmsRepository {
         });
     }
 
-    public Single<OcCsr> retrieveCsr(String endpoint) {
+    public Single<OcCsr> retrieveCsr(String endpoint, String deviceId) {
         return Single.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response)-> {
                 OCStatus code = response.getCode();
@@ -96,10 +97,12 @@ public class CmsRepository {
         });
     }
 
-    public Completable provisionIdentityCertificate(String endpoint, String uuid, String identityCert) {
+    public Completable provisionIdentityCertificate(String endpoint, String deviceId, String identityCert) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid di = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, di);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();
@@ -117,7 +120,7 @@ public class CmsRepository {
                 publicData.setEncoding(OcfEncoding.OC_ENCODING_PEM);
 
                 OcCredential cred = new OcCredential();
-                cred.setSubjectuuid(uuid);
+                cred.setSubjectuuid(deviceId);
                 cred.setCredtype(OcfCredType.OC_CREDTYPE_CERT);
                 cred.setCredusage(OcfCredUsage.OC_CREDUSAGE_CERT);
                 cred.setPublicData(publicData);
@@ -145,10 +148,12 @@ public class CmsRepository {
         });
     }
 
-    public Completable provisionRoleCertificate(String endpoint, String uuid, String roleCert, String roleId, String roleAuthority) {
+    public Completable provisionRoleCertificate(String endpoint, String deviceId, String roleCert, String roleId, String roleAuthority) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid di = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, di);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();
@@ -170,7 +175,7 @@ public class CmsRepository {
                 role.setAuthority(roleAuthority);
 
                 OcCredential cred = new OcCredential();
-                cred.setSubjectuuid(uuid);
+                cred.setSubjectuuid(deviceId);
                 cred.setCredtype(OcfCredType.OC_CREDTYPE_CERT);
                 cred.setCredusage(OcfCredUsage.OC_CREDUSAGE_ROLECERT);
                 cred.setPublicData(publicData);
@@ -199,10 +204,12 @@ public class CmsRepository {
         });
     }
 
-    public Completable createPskCredential(String endpoint, String uuid, byte[] symmetricKey) {
+    public Completable createPskCredential(String endpoint, String deviceId, String targetUuid, byte[] symmetricKey) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid di = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, di);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();
@@ -220,7 +227,7 @@ public class CmsRepository {
                 privateData.setEncoding(OcfEncoding.OC_ENCODING_RAW);
 
                 OcCredential cred = new OcCredential();
-                cred.setSubjectuuid(uuid);
+                cred.setSubjectuuid(targetUuid);
                 cred.setCredtype(OcfCredType.OC_CREDTYPE_PSK);
                 cred.setPrivateData(privateData);
                 List<OcCredential> credList = new ArrayList<>();
@@ -247,10 +254,12 @@ public class CmsRepository {
         });
     }
 
-    public Completable deleteCredential(String endpoint, long credId) {
+    public Completable deleteCredential(String endpoint, String deviceId, long credId) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();

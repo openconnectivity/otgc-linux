@@ -151,10 +151,12 @@ public class DoxsRepository {
         this.randomPinHandler = randomPinCallbackListener;
     }
 
-    public Single<OcDoxm> get(String endpoint) {
+    public Single<OcDoxm> get(String endpoint, String deviceId) {
         return Single.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();
@@ -175,10 +177,12 @@ public class DoxsRepository {
         });
     }
 
-    public Completable post(String endpoint, OcDoxm doxm) {
+    public Completable post(String endpoint, String deviceId, OcDoxm doxm) {
         return Completable.create(emitter -> {
             OCEndpoint ep = OCEndpointUtil.newEndpoint();
             OCEndpointUtil.stringToEndpoint(endpoint, ep, new String[1]);
+            OCUuid uuid = OCUuidUtil.stringToUuid(deviceId);
+            OCEndpointUtil.setDi(ep, uuid);
 
             OCResponseHandler handler = (OCClientResponse response) -> {
                 OCStatus code = response.getCode();

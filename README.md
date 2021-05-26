@@ -23,6 +23,13 @@
   
 ## Overview
 
+please use:
+
+ https://github.com/iotivity/otgc-linux
+
+
+this repo will be depricated!
+
 ## Project Setup
 ### IoTivity-lite API
 To import the IoTivity-lite API Binary into the OTGC Linux App project:
